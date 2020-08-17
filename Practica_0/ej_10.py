@@ -7,7 +7,7 @@ Author : Facundo Martin Cabrera
 Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
 GitLab: https://gitlab.com/cabre94
-Description: 
+Description: https://matplotlib.org/gallery/images_contours_and_fields/interpolation_methods.html
 """
 
 import os
@@ -24,11 +24,11 @@ y = np.linspace(-3, 3, 3 * n)
 X, Y = np.meshgrid(x,y)
 
 plt.axes([0.025, 0.025, 0.95, 0.95])
-plt.imshow(f(X, -Y), cmap='gray')	# Para que me quedara igual que en el enunciado tengo que cambiar el eje y
-plt.colorbar(shrink=.92)
-
-
+plt.imshow(f(X, Y), cmap='bone', origin='lower')	# Para que me quedara igual que en el enunciado tengo que cambiar el eje y
+plt.colorbar(shrink=.8)
 
 plt.xticks(())
 plt.yticks(())
+plt.savefig('Informe/ej_10.png', format='png', bbox_inches='tight')
 plt.show()
+
