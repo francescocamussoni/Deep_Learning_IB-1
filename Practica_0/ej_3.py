@@ -15,4 +15,5 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-
+def Bhaskara(a,b=0,c=0):
+	return np.roots([a,b,c]) 	# No se si esto es trampa
