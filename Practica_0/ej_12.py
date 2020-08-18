@@ -22,7 +22,7 @@ T = np.arctan2(Y, X)
 #T = 2 * np.pi * np.random.rand(n)
 
 plt.axes([0.025, 0.025, 0.95, 0.95])
-plt.scatter(X, Y, c=T, cmap='jet', alpha=0.5, edgecolors='black')
+plt.scatter(X, Y, c=T, cmap='jet', alpha=0.5, edgecolors='black')  	# https://matplotlib.org/tutorials/colors/colormaps.html
 
 plt.xlim(-1.5, 1.5)
 plt.xticks(())
@@ -30,4 +30,3 @@ plt.ylim(-1.5, 1.5)
 plt.yticks(())
 
 plt.show()
-
