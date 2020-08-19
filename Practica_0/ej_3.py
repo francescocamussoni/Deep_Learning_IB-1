@@ -18,7 +18,8 @@ from matplotlib import pyplot as plt
 def Bhaskara(a,b=0,c=0):
 	return np.roots([a,b,c]) 	# No se si esto es trampa
 
-res = Bhaskara(1,1,1)
+if __name__ == '__main__':
+	res = Bhaskara(1,1,1)
 
-print("Ejercicio 3: Las raices de x²+x+1 son:")
-print("x_1 = {}\nx_2 = {}".format(res[0], res[1]))
+	print("Ejercicio 3: Las raices de x²+x+1 son:")
+	print("x_1 = {}\nx_2 = {}".format(res[0], res[1]))
