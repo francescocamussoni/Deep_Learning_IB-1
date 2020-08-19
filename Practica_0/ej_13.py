@@ -24,12 +24,20 @@ class R2(object):
 		aux = R2(self.r[0], self.r[1])
 		aux.r = self.r + R.r
 		return aux
+	def __sub__(self, R):
+		aux = R2(self.r[0], self.r[1])
+		aux.r = self.r - R.r
+		return aux
 	def __truediv__(self,n):
 		aux = R2(self.r[0], self.r[1])
 		aux.r = self.r / n
 		return aux
+	def __mul__(self,n):
+		aux = R2(self.r[0], self.r[1])
+		aux.r = self.r * n
+		return aux
 	def norma(self):
-		return numpy.linalg.norm(self.R2)
+		return np.linalg.norm(self.r)
 
 class Pez(object):
 	"""docstring for Pez"""
@@ -70,6 +78,33 @@ class Cardumen(object):
 		self.CMyVM()
 		#self.CM = self.CM()
 		#self.VM = self.VM()
+
+	def reglaA(i):
+		return (self.CM - self.Peces[i].pos) / 8
+
+	def reglaB(i):
+		aux = R2(0,0)
+		for j in range(self.N):
+			if j != i:
+				dif = self.Peces[i].pos - self.Peces[j].pos
+				d = dif.norma()
+				if d < self.__maxDist:
+					aux = aux + (dif / d)
+		return aux
+
+	def reglaC(i):
+		return (self.VM - self.Peces[i].vel) / 8
+
+	def reglas(i):
+		return self.reglaA[i] + self.reglaB[i] + self.reglaC[i]
+
+	def doStep():
+		# Calculo los delta de velocidad de cada pez
+		DeltaV = np.array([self.reglas[i] for i in range(self.N)])
+		# Modifico las posiciones
+		self.Peces
+
+
 
 		
 		
