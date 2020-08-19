@@ -12,7 +12,7 @@ Description:
 
 import os
 import numpy as np
-#from scipy import linalg
+
 
 A = np.array([[ 1,  0,  1],
 			  [ 2, -1,  1],
@@ -27,9 +27,3 @@ invA = np.linalg.inv(A)
 res = np.dot(invA,b)
 
 print("res = {}".format(res))
-
-#c = np.array([-2, 1,-1])
-
-#res = np.array([1, -2, -3])
-
-# x = 1	y = -2	z = -3
