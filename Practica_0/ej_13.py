@@ -125,6 +125,12 @@ class Cardumen(object):
 			if self.Peces[i].vel.norma() > self.__maxVel:
 				self.Peces[i].vel = (self.Peces[i].vel / self.Peces[i].vel.norma()) * self.__maxVel
 
+			plt.plot(self.Peces[i].pos.r[0], self.Peces[i].pos.r[1], 'bo')
+		
+		plt.xlim(0,40)
+		plt.ylim(0,40)
+		plt.show()
+
 	def print(self):
 		for i in range(self.N):
 			print("Pez: {}".format(i), end=' ')
@@ -138,7 +144,7 @@ class Cardumen(object):
 		
 		
 c = Cardumen()
-c.initialize(5, 10, 5)
-for i in range(5):
+c.initialize(16, 10, 5)
+for i in range(50):
 	c.doStep()
 	c.print()
