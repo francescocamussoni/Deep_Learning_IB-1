@@ -79,10 +79,10 @@ class Cardumen(object):
 		#self.CM = self.CM()
 		#self.VM = self.VM()
 
-	def reglaA(i):
+	def reglaA(self,i):
 		return (self.CM - self.Peces[i].pos) / 8
 
-	def reglaB(i):
+	def reglaB(self,i):
 		aux = R2(0,0)
 		for j in range(self.N):
 			if j != i:
@@ -92,17 +92,46 @@ class Cardumen(object):
 					aux = aux + (dif / d)
 		return aux
 
-	def reglaC(i):
+	def reglaC(self,i):
 		return (self.VM - self.Peces[i].vel) / 8
 
-	def reglas(i):
-		return self.reglaA[i] + self.reglaB[i] + self.reglaC[i]
+	def reglas(self,i):
+		return self.reglaA(i) + self.reglaB(i) + self.reglaC(i)
 
-	def doStep():
+	def rebote(self,Pez):
+		pass
+
+	def doStep(self):
 		# Calculo los delta de velocidad de cada pez
-		DeltaV = np.array([self.reglas[i] for i in range(self.N)])
-		# Modifico las posiciones
-		self.Peces
+		DeltaV = np.array([self.reglas(i) for i in range(self.N)])
+		# Modifico las posiciones y velocidades
+		for i in range(self.N):
+			self.Peces[i].pos = self.Peces[i].pos + self.Peces[i].vel
+			self.Peces[i].vel = self.Peces[i].vel + DeltaV[i]
+			if self.Peces[i].pos.r[0] > 40:
+				self.Peces[i].pos.r[0] = 80 - self.Peces[i].pos.r[0]	# Lo hago rebotar en x
+				self.Peces[i].vel.r[0] = -self.Peces[i].vel.r[0]		# Lo hago rebotar
+			elif self.Peces[i].pos.r[0] < 0:
+				self.Peces[i].pos.r[0] = - self.Peces[i].pos.r[0]
+				self.Peces[i].vel.r[0] = -self.Peces[i].vel.r[0]		# Lo hago rebotar
+
+			if self.Peces[i].pos.r[1] > 40:
+				self.Peces[i].pos.r[1] = 80 - self.Peces[i].pos.r[1]	# Lo hago rebotar en x
+				self.Peces[i].vel.r[1] = -self.Peces[i].vel.r[1]		# Lo hago rebotar
+			elif self.Peces[i].pos.r[1] < 0:
+				self.Peces[i].pos.r[1] = - self.Peces[i].pos.r[1]
+				self.Peces[i].vel.r[1] = -self.Peces[i].vel.r[1]		# Lo hago rebotar
+			# Limito la velocidad
+			if self.Peces[i].vel.norma() > self.__maxVel:
+				self.Peces[i].vel = (self.Peces[i].vel / self.Peces[i].vel.norma()) * self.__maxVel
+
+	def print(self):
+		for i in range(self.N):
+			print("Pez: {}".format(i), end=' ')
+			print("pos = ({}, {})".format(self.Peces[i].pos.r[0], self.Peces[i].pos.r[1]), end=' ')
+			print("vel = ({}, {})".format(self.Peces[i].vel.r[0], self.Peces[i].vel.r[1]))
+
+
 
 
 
@@ -110,3 +139,6 @@ class Cardumen(object):
 		
 c = Cardumen()
 c.initialize(5, 10, 5)
+for i in range(5):
+	c.doStep()
+	c.print()
