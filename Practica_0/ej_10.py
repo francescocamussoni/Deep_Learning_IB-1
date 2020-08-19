@@ -24,11 +24,12 @@ y = np.linspace(-3, 3, 3 * n)
 X, Y = np.meshgrid(x,y)
 
 plt.axes([0.025, 0.025, 0.95, 0.95])
-plt.imshow(f(X, Y), cmap='bone', origin='lower')	# Para que me quedara igual que en el enunciado tengo que cambiar el eje y
+plt.imshow(f(X, Y), cmap='bone', origin='lower')	# De los tipos de interpolacion, el unico que deja pixeleada la imagen
+													# es "nearest", pero no cambia nada con dejarlo en blanco (creo)
 plt.colorbar(shrink=.8)
 
 plt.xticks(())
 plt.yticks(())
-plt.savefig('Informe/ej_10.png', format='png', bbox_inches='tight')
+plt.savefig('Informe/ej_10.pdf', format='pdf', bbox_inches='tight')
 plt.show()
 
