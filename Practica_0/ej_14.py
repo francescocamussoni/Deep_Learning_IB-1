@@ -7,15 +7,13 @@ Author : Facundo Martin Cabrera
 Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
 GitLab: https://gitlab.com/cabre94
-Description: 
+Description: https://numpy.org/doc/stable/reference/random/generated/numpy.random.randint.html
 """
 
 import os
 import numpy as np
 from matplotlib import pyplot as plt
 
-
-# https://numpy.org/doc/stable/reference/random/generated/numpy.random.randint.html
 
 n = np.arange(10,61,5)
 #coincidences = np.zeros(n.shape)
@@ -30,8 +28,9 @@ for i in n:
 			count += 1
 	coincidences = np.append(coincidences, (count/1000)*100)
 
-print(n)
-print(coincidences)
-
+#plt.title("Ejercicio 14")
+plt.xlabel("# de personas en el grupo")
+plt.ylabel(r"$\%$")
 plt.plot(n, coincidences, 'bo')
+plt.savefig('Informe/ej_14.svg', format='svg', bbox_inches='tight')
 plt.show()
