@@ -268,6 +268,69 @@ def ejercicio_12():
 	plt.show()
 
 
+#--------------------------------------------------------------
+#			Ejercicio 12 con las proyecciones en los ejes
+#--------------------------------------------------------------
+
+n = 1024
+X = np.random.normal(0,1,n)
+Y = np.random.normal(0,1,n)
+T = np.arctan2(Y, X)
+
+# Esta funcion esta sacada de https://matplotlib.org/gallery/lines_bars_and_markers/scatter_hist.html#sphx-glr-gallery-lines-bars-and-markers-scatter-hist-py
+# Pero esta un poco modificada para el ejercicio
+def scatter_hist(x, y, ax, ax_histx, ax_histy):
+    # no labels
+    #ax.tick_params(axis="x", labelbottom=False)
+    #ax.tick_params(axis="y", labelleft=False)
+
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+    ax_histx.get_xaxis().set_visible(False)
+    ax_histy.get_yaxis().set_visible(False)
+
+
+    #ax_histx.tick_params(axis="x", labelbottom=False)
+    #ax_histy.tick_params(axis="y", labelleft=False)
+
+    # the scatter plot:
+    ax.scatter(X, Y, c=T, cmap='jet', alpha=0.5, edgecolors='gray')  	# https://matplotlib.org/tutorials/colors/colormaps.html
+
+    # now determine nice limits by hand:
+    binwidth = 0.25
+    xymax = max(np.max(np.abs(X)), np.max(np.abs(Y)))
+    lim = (int(xymax/binwidth) + 1) * binwidth
+
+    bins = np.arange(-lim, lim + binwidth, binwidth)
+    ax_histx.hist(X, bins=bins)
+    ax_histy.hist(Y, bins=bins, orientation='horizontal')
+
+
+def ejercicio_12_histograma():
+	# definitions for the axes
+	left, width = 0.1, 0.65
+	bottom, height = 0.1, 0.65
+	spacing = 0.005
+
+	rect_scatter = [left, bottom, width, height]
+	rect_histx = [left, bottom + height + spacing, width, 0.2]
+	rect_histy = [left + width + spacing, bottom, 0.2, height]
+
+	fig = plt.figure(figsize=(8, 8))
+
+	ax = fig.add_axes(rect_scatter)
+	ax_histx = fig.add_axes(rect_histx, sharex=ax)
+	ax_histy = fig.add_axes(rect_histy, sharey=ax)
+
+	scatter_hist(X, Y, ax, ax_histx, ax_histy)
+
+	#plt.savefig('Informe/ej_12_Histograma.pdf', format='pdf', bbox_inches='tight')
+
+	plt.show()
+
+
+
 #---------------------------------
 #			Ejercicio 13
 #---------------------------------
@@ -454,8 +517,8 @@ def ejercicio_14():
 		coincidences = np.append(coincidences, (count/1000)*100)
 
 	plt.title("Ejercicio 14")
-	plt.xlabel("# de personas en el grupo")
-	plt.ylabel(r"$\%$")
+	plt.xlabel("# de personas en el grupo", fontsize=14)
+	plt.ylabel(r"$\%$ de cumpleaños repetido", fontsize=14)
 	plt.plot(n, coincidences, 'bo')
 	#plt.savefig('Informe/ej_14.svg', format='svg', bbox_inches='tight')
 	plt.show()
@@ -491,28 +554,30 @@ def ejercicio_15(minV,maxV):
 
 if __name__ == '__main__':
 
-	#ejercicio_1()
+	ejercicio_1()
 
-	#ejercicio_2()
+	ejercicio_2()
 
-	#ejercicio_3(1,1,1)
+	ejercicio_3(1,1,1)
 
-	#ejercicio_4(-3,2,16)
+	ejercicio_4(-3,2,16)
 
-	#ejercicio_5(5,3,2)
+	ejercicio_5(5,3,2)
 
-	#ejercicio_6(5,3,2)
+	ejercicio_6(5,3,2)
 
-	#ejercicio_7()
+	ejercicio_7()
 
-	#ejercicio_10()
+	ejercicio_10()
 
-	#ejercicio_11()
+	ejercicio_11()
 
-	#ejercicio_12()
+	ejercicio_12()
 
-	#ejercicio_13(40,4,1)
+	ejercicio_12_histograma()
 
-	#ejercicio_14()
+	ejercicio_13(40,4,1)
 
-	#ejercicio_15(-1,1)
+	ejercicio_14()
+
+	ejercicio_15(-1,1)
