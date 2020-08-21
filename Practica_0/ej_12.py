@@ -30,4 +30,6 @@ plt.ylim(-1.5, 1.5)
 plt.yticks(())
 plt.savefig('Informe/ej_12.pdf', format='pdf', bbox_inches='tight')
 
+#plt.gca().get_xaxis().set_visible(False)
+
 plt.show()

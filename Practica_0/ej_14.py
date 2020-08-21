@@ -29,8 +29,8 @@ for i in n:
 	coincidences = np.append(coincidences, (count/1000)*100)
 
 #plt.title("Ejercicio 14")
-plt.xlabel("# de personas en el grupo")
-plt.ylabel(r"$\%$")
+plt.xlabel("# de personas en el grupo", fontsize=14)
+plt.ylabel(r"$\%$ de cumpleaños repetido", fontsize=14)
 plt.plot(n, coincidences, 'bo')
 plt.savefig('Informe/ej_14.pdf', format='pdf', bbox_inches='tight')
 plt.show()

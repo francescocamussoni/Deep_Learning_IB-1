@@ -92,7 +92,7 @@ class Cardumen(object):
 		plt.xlim(0,dim)
 		plt.ylim(0,dim)
 		plt.xticks(())
-		plt.yticks(())		
+		plt.yticks(())
 
 	def reglaA(self,i):
 		return (self.CM - self.Peces[i].pos) / 8
@@ -146,6 +146,25 @@ class Cardumen(object):
 		self.iteracion += 1
 		if self.iteracion % PLOTEA == 0:
 			self.gif.append( [self.plotea()] )
+
+		if self.iteracion % (NUM_ITERAC // 5) == 1:
+
+			X  = np.array( [self.Peces[i].pos.r[0] for i in range(self.N)] )
+			Y  = np.array( [self.Peces[i].pos.r[1] for i in range(self.N)] )
+			Vx = np.array( [self.Peces[i].vel.r[0] for i in range(self.N)] )
+			Vy = np.array( [self.Peces[i].vel.r[1] for i in range(self.N)] )
+
+			fig = plt.figure()
+
+			plt.xlim(0,self.dim)
+			plt.ylim(0,self.dim)
+			plt.xticks(())
+			plt.yticks(())	
+
+			ax = fig.add_subplot(1, 1, 1)
+			ax = plt.quiver(X,Y,Vx,Vy)
+			plt.savefig('Informe/ej_13_{}.pdf'.format(self.iteracion), format='pdf', bbox_inches='tight')
+
 
 	def plotea(self):
 		X  = np.array( [self.Peces[i].pos.r[0] for i in range(self.N)] )

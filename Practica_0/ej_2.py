@@ -41,6 +41,6 @@ ax = fig.add_subplot(1,1,1)
 ax.hist(data, bins=30, alpha=0.8, label="Datos")
 ax.plot(x, dist.pdf(x) *1000, 'r', label="Dist. Gamma")	# Lo desnormalice
 ax.legend(loc="best")
-ax.set_ylabel("Cuentas")
+ax.set_ylabel("Repeticiones", fontsize=15)
 fig.savefig('Informe/ej_2.pdf', format='pdf', bbox_inches='tight')
 plt.show()

@@ -32,14 +32,14 @@ def grafYRaices(a,b,c):
 	plt.plot(x,p,'b-')
 	if r1.imag == 0 and r1 <= 4 and r1 >= -4.5:
 		plt.plot(r1,0,'or')
-		plt.annotate(s=r"$x_1=${:.2f}".format(r1), xy=(r1, 0), xytext=(r1+0.3, 0))
+		plt.annotate(s=r"$x_1=${:.2f}".format(r1), xy=(r1, 0), xytext=(r1, 2), fontsize=15)
 	if r2.imag == 0 and r2 <= 4 and r2 >= -4.5:
 		plt.plot(r2,0,'or')
-		plt.annotate(s=r"$x_2=${:.2f}".format(r2), xy=(r2, 0), xytext=(r2+0.3, 0))
+		plt.annotate(s=r"$x_2=${:.2f}".format(r2), xy=(r2, 0), xytext=(r2+0.3, 0), fontsize=15)
 
 	seteaGrilla()
-	plt.xlabel("x")
-	plt.ylabel(r"y(x) = ${}x^2 +{}x +{}$".format(a,b,c))
+	plt.xlabel("x", fontsize=15)
+	plt.ylabel(r"y(x) = ${}x^2 +{}x +{}$".format(a,b,c), fontsize=15)
 	#plt.title("Ejercicio 4")
 	plt.savefig('Informe/ej_4.pdf', format='pdf', bbox_inches='tight')
 	plt.show()
