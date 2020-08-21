@@ -27,4 +27,8 @@ class Noiser(object):
 		return x + np.random.uniform(self.minV,self.maxV)
 		
 
-v_Noiser = np.vectorize(Noiser(0,2))
+v_Noiser = np.vectorize(Noiser(-1,1))
+
+a = np.zeros(10)
+
+v_Noiser(a)
