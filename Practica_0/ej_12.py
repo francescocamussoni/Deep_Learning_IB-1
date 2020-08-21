@@ -7,7 +7,7 @@ Author : Facundo Martin Cabrera
 Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
 GitLab: https://gitlab.com/cabre94
-Description: 
+Description: https://matplotlib.org/tutorials/colors/colormaps.html
 """
 
 import os
@@ -22,11 +22,12 @@ T = np.arctan2(Y, X)
 #T = 2 * np.pi * np.random.rand(n)
 
 plt.axes([0.025, 0.025, 0.95, 0.95])
-plt.scatter(X, Y, c=T, cmap='jet', alpha=0.5, edgecolors='black')  	# https://matplotlib.org/tutorials/colors/colormaps.html
+plt.scatter(X, Y, c=T, cmap='jet', alpha=0.5, edgecolors='gray')  	# https://matplotlib.org/tutorials/colors/colormaps.html
 
 plt.xlim(-1.5, 1.5)
 plt.xticks(())
 plt.ylim(-1.5, 1.5)
 plt.yticks(())
+plt.savefig('Informe/ej_12.png', format='png', bbox_inches='tight')
 
 plt.show()
