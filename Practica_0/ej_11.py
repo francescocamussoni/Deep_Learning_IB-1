@@ -32,5 +32,5 @@ plt.clabel(C, inline=5, fontsize=8)
 
 plt.xticks(())
 plt.yticks(())
-plt.savefig('Informe/ej_11.png', format='png', bbox_inches='tight')
+plt.savefig('Informe/ej_11.pdf', format='pdf', bbox_inches='tight')
 plt.show()

@@ -28,6 +28,6 @@ plt.xlim(-1.5, 1.5)
 plt.xticks(())
 plt.ylim(-1.5, 1.5)
 plt.yticks(())
-plt.savefig('Informe/ej_12.png', format='png', bbox_inches='tight')
+plt.savefig('Informe/ej_12.pdf', format='pdf', bbox_inches='tight')
 
 plt.show()

@@ -32,5 +32,5 @@ for i in n:
 plt.xlabel("# de personas en el grupo")
 plt.ylabel(r"$\%$")
 plt.plot(n, coincidences, 'bo')
-plt.savefig('Informe/ej_14.svg', format='svg', bbox_inches='tight')
+plt.savefig('Informe/ej_14.pdf', format='pdf', bbox_inches='tight')
 plt.show()
