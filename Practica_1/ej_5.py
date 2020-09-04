@@ -16,13 +16,23 @@ from matplotlib import pyplot as plt
 from keras.datasets import cifar10
 from keras.datasets import mnist
 
+"""
+import matplotlib as mpl
+mpl.rcParams.update({
+	'font.size': 20,
+	'figure.figsize': [12, 8],
+	'figure.autolayout': True,
+	'font.family': 'serif',
+	'font.sans-serif': ['Palatino']})
+"""
+
 np.random.seed(10)
 
 class LinearClassifier():
     def __init__(self, n):
         self.n = n  #Numero de clases
         pass
-    def fit(self, x_train, y_train, x_test, y_test, size_bacht=50, lr=1e-4, landa=0.01, epochs=500):
+    def fit(self, x_train, y_train, x_test, y_test, size_bacht=50, lr=1e-3, landa=0.01, epochs=500):
         self.lr = lr
         self.l = landa
         self.epochs = epochs
@@ -30,24 +40,20 @@ class LinearClassifier():
         self.loss = np.array([])
         self.acc = np.array([])
 
-        # Acomodo las entradas
-        self.X = x_train.reshape(len(x_train), x_train[0].size).astype(np.float)
-        #self.X = x_train.reshape(len(x_train), x_train[0].size).astype(np.float)/255
+        # Acomodo las entradas del entrenamiento
+        self.X = x_train.reshape(len(x_train), x_train[0].size).astype(np.float)#/255
+        self.X = np.hstack((np.ones((len(self.X),1)), self.X))              # Pongo 1 para el bias
         self.Y = y_train.reshape(y_train.size)
 
-
-        #import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
-
-        self.X = np.hstack((np.ones((len(self.X),1)), self.X))  # Pongo 1 para el bias
-
-        self.X_t = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)
-        #self.X_t = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)/255
+        # Acomodo las entradas del test
+        self.X_t = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)#/255
+        self.X_t = np.hstack((np.ones((len(self.X_t),1)), self.X_t))        # Pongo 1 para el bias
         self.Y_t = y_test.reshape(y_test.size)
 
         # Inicializo W
         self.W = np.random.uniform(-10, 10, size=(self.n, self.X.shape[1]))
 
-        itr = int(len(x_train)/self.sbacht)  # Cuantos bacht tengo
+        n_bacht = int(len(x_train)/self.sbacht)  # Cuantos bacht tengo
 
 
 
@@ -55,28 +61,26 @@ class LinearClassifier():
 
         
         for e in range(self.epochs):
-            count = 0
-            count2 = 0
-            for i in range(itr):
+            c_loss = 0
+            c_acc = 0
+            for i in range(n_bacht):
 
-                # Me quedo con un pedazo de los datos
-                x_bacht = self.X[self.sbacht*i: self.sbacht*(i+1)]
+                x_bacht = self.X[self.sbacht*i: self.sbacht*(i+1)]      # Me quedo con un pedazo de los datos
                 y_bacht = self.Y[self.sbacht*i: self.sbacht*(i+1)]
 
                 loss, dw = self.loss_gradient(x_bacht, y_bacht)
 
-                count += loss
+                c_loss += loss
 
                 predict_y = self.predict(x_bacht)
-                count2 += self.accuracy(y_bacht, predict_y)
+                c_acc += self.accuracy(y_bacht, predict_y)
                 
                 self.W -= self.lr * dw
             
-            print(e," ",count2/itr)
-            #print()
+            print(e," ",c_acc/n_bacht)
             
-            self.loss = np.append(self.loss, count/itr)
-            self.acc = np.append(self.acc, count2/itr)
+            self.loss = np.append(self.loss, c_loss/n_bacht)
+            self.acc  = np.append(self.acc,   c_acc/n_bacht)
         
 
         e = np.arange(self.epochs)
@@ -114,6 +118,12 @@ class LinearClassifier():
     def accuracy(self, y_true, y_pred):
         accuracy = (np.sum(y_true == y_pred) / len(y_true))
         return accuracy*100
+    
+    def getLoss(self):
+        return self.loss
+    
+    def getAccuracy(self):
+        return self.acc
 
 
 class SVM(LinearClassifier):
