@@ -32,7 +32,7 @@ class LinearClassifier():
     def __init__(self, n):
         self.n = n  #Numero de clases
         pass
-    def fit(self, x_train, y_train, x_test, y_test, size_bacht=50, lr=1e-3, landa=0.01, epochs=500):
+    def fit(self, x_train, y_train, x_test, y_test, size_bacht=50, lr=1e-4, landa=0.001, epochs=500):
         self.lr = lr
         self.l = landa
         self.epochs = epochs
@@ -55,11 +55,7 @@ class LinearClassifier():
 
         n_bacht = int(len(x_train)/self.sbacht)  # Cuantos bacht tengo
 
-
-
-
-
-        
+        # Recorro las epocas        
         for e in range(self.epochs):
             c_loss = 0
             c_acc = 0
@@ -68,7 +64,7 @@ class LinearClassifier():
                 x_bacht = self.X[self.sbacht*i: self.sbacht*(i+1)]      # Me quedo con un pedazo de los datos
                 y_bacht = self.Y[self.sbacht*i: self.sbacht*(i+1)]
 
-                loss, dw = self.loss_gradient(x_bacht, y_bacht)
+                loss, dw = self.loss_gradient(x_bacht, y_bacht)     # Me molesta que el VSCode me tire que esta linea esta mal
 
                 c_loss += loss
 
@@ -82,33 +78,32 @@ class LinearClassifier():
             self.loss = np.append(self.loss, c_loss/n_bacht)
             self.acc  = np.append(self.acc,   c_acc/n_bacht)
         
+        test_predict = self.predict(self.X_t)
 
-        e = np.arange(self.epochs)
+        print("Precision final con los datos de entrenamiento: ", self.acc[-1])
+        print("Precision con los datos de test: ", self.accuracy(test_predict, self.Y_t))
+        
 
-        plt.plot(e, self.loss)
+        self.e = np.arange(self.epochs)
+
+        self.plotLoss()
+        self.plotAcurracy()
+
+    def plotLoss(self):
+
+        plt.plot(self.e, self.loss)
         plt.show()
 
-        plt.plot(e, self.acc)
+    def plotAcurracy(self):
+
+        plt.plot(self.e, self.loss)
         plt.show()
-
-
-        # Defino varialbes para accuracy y loss
-        # tamaño bacth
-        # ciclo en epocas
-        # ciclo batch
-        # self.W -= stepsize * np.mean(loss_gradiemt)
-        # Actualizao cosas para graficar
-        # Cuando termina la epoca, calculo el promedio de loss?????????
-
-        #for e in range(self.epochs):
-
 
     def predict(self, x_testt):
         #import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
-        
-        #x_testt = x_testt.reshape(len(x_testt), x_testt[0].size).astype(np.float)
-        #x_testt = np.hstack((np.ones((len(x_testt),1)), x_testt))
-        #print(x_testt.shape)
+        if(self.X.shape[1] != x_testt.shape[1]):
+            x_testt = x_testt.reshape(len(x_testt), x_testt[0].size).astype(np.float)
+            x_testt = np.hstack((np.ones((len(x_testt),1)), x_testt))
         scores = np.dot(self.W, x_testt.T)
         return np.argmax(scores, axis=0)
 
