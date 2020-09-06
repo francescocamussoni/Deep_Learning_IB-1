@@ -73,6 +73,46 @@ class createCluster():
     
     def getClusters(self):
         return self.clusters
+    
+    def uglyData(self):
+        # Voy a generarme dos cluster que sean un anillo y un circulo dentro del anillo
+        # lo voy a hacer asi nomas porque son las 4am 
+
+        numData = 400
+
+        c1 = np.array([])
+        c2 = []
+
+        for _ in range(numData):
+            p = np.random.normal((0,0), 1)
+            d = np.linalg.norm(p)
+            while(d > 2):
+                p = np.random.normal((0,0), 1)
+                d = np.linalg.norm(p)
+            c1 = np.append(c1,p)
+        
+        c1 = c1.reshape((numData,2))
+        
+        for _ in range(numData):
+            p = np.random.normal((0,0),4)
+            d = np.linalg.norm(p)
+            while(d<2 or d>3):
+                p = np.random.normal((0,0), 4)
+                d = np.linalg.norm(p)
+            c2 = np.append(c2,p)
+        
+        c2 = c2.reshape((numData,2))
+
+        self.dataFeo = np.append(c1,c2).reshape((2*numData,2))
+
+        self.clusterFeo = self.dataFeo.reshape((2,numData,2))
+        
+        return self.dataFeo
+    
+    def uglyCluster(self):
+        return self.clusterFeo
+
+
 
 # Para armar el video
 #fig = plt.figure()
@@ -124,7 +164,7 @@ class kMeans():
                     #aux.append( plt.scatter(self.cluster[i][:,0], self.cluster[i][:,1], marker='.' ))
                     #aux.append( plt.scatter(self.means[i][0], self.means[i][1], c='k', marker='x')  )
                 #ims.append( (aux) )
-                plt.title(r'p=4  k={}   iteracion = {}'.format(self.k,count))
+                #plt.title(r'p=4  k={}   iteracion = {}'.format(self.k,count))
                 #plt.savefig('Informe/2/2_{}_{}.pdf'.format(self.k,count), format='pdf', bbox_inches='tight')
                 plt.pause(1)
                 #plt.close()
@@ -132,8 +172,6 @@ class kMeans():
                 #plt.show()
             
             count += 1
-
-
 
 
 
@@ -149,8 +187,8 @@ data = kk.createData()
 cluster = kk.getClusters()
 #aux = []       # Para armar el video
 
-# Grafico la distribucion original
-for i in range(len(cluster)):
+
+for i in range(len(cluster)):                           # Grafico la distribucion original
     plt.scatter(cluster[i][:,0], cluster[i][:,1], marker='.')
 
 #for _ in range(4):     # Para armar el video
@@ -165,10 +203,29 @@ plt.clf()
 
 np.random.seed(1)
 
-# Ejecuto el algoritmo para k desde 2 a 5
-for i in range(2,6):
+
+for i in range(2,6):                        # Ejecuto el algoritmo para k desde 2 a 5
     knn = kMeans(N,k=i)
     knn.execute(data)
+
+##########################
+# Ahora con una distribucion que no funciona
+##########################
+
+kk2 = createCluster(2)
+dataFea = kk2.uglyData()
+clusterFeo = kk2.uglyCluster()
+
+plt.scatter(clusterFeo[0][:,0], clusterFeo[0][:,1], marker='.', color='red')
+plt.scatter(clusterFeo[1][:,0], clusterFeo[1][:,1], marker='.', color='blue')
+#plt.savefig('Informe/2/2_FEO.pdf', format='pdf', bbox_inches='tight')
+plt.pause(3)
+plt.clf()
+#plt.show()
+
+knn2 = kMeans(N=2,k=2)
+knn2.execute(dataFea)
+
 
 
 # De aca para abajo es para armar el video, asi que lo comento

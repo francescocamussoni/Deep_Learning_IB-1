@@ -14,166 +14,145 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 
+import seaborn as snn
+
+snn.set(font_scale = 1)
+
 # Doy una semilla para que me cree los mismos puntos aleatorios
 np.random.seed(10)
 
 
 class ajusteLineal():
-    def __init__(self,N, argMin=-10, argMax=10):
+    def __init__(self,N, argMin=0, argMax=10):
         self.N = N
         self.min = argMin
         self.max = argMax
         # Para no complicarme, los coeficientes del hiperplano los hago entero en un rango razonable
-        #self.coef = np.random.randint(-5,5,(N+1,1))         
-        self.coef = np.random.uniform(-1,1,(N+1,1))         
+        self.coef = np.random.uniform(-10,10,(N+1,1))         
 
-    def RandomData(self, M, std=1):
+    def randomData(self, M, std=1):
         self.X = np.random.uniform(self.min, self.max, size=(M,self.N))
-        self.X = np.hstack((np.ones((M,1)), self.X))   # Agrego 1 para el bias
-        self.Y = self.X @ self.coef         # Estos son los y reales
+        self.X = np.hstack((np.ones((M,1)), self.X))          # Agrego 1 para el bias
+        self.Y = self.X @ self.coef                           # Estos son los y reales
         noise = np.random.normal(0, std, size=self.Y.shape)
         self.Y_noise = self.Y + noise
         # Aca saco los coeficientes ajustados
         self.beta = np.linalg.inv(self.X.T @ self.X) @ self.X.T @ self.Y_noise
 
     def plotAll(self, save=True):
+        fig = plt.figure(figsize=(10,5))
+        ax = plt.subplot(111)
+        
         for i in range(self.N):
-            #plt.plot(self.X[:,i+1], self.Y_noise, 'o', label="Dim. "+str(i+1))
-            #plt.plot(self.X[:,i+1], self.X[:,[0,i+1]] @ self.coef[[0,i+1]], 'o', label="Dim. "+str(i+1))
-            plt.plot(self.X[:,i+1], self.X.T[i+1] * self.coef[i+1], 'o', label="Dim. "+str(i+1))
-            #plt.plot(self.X[:,i+1], self.X[:,i+1] * self.coef[i+1] + self.coef[0], 'o', label="Dim. "+str(i+1))
-            plt.plot(self.X[:,i+1], self.X[:,i+1] * self.beta[i+1] + self.beta[0], 'k')
-        plt.legend(loc="best")
-        plt.xlabel("X", fontsize=15)
-        plt.ylabel("Y", fontsize=15)
+            ax.plot(self.X[:,i+1], self.Y_noise - np.delete(self.X,i+1,axis=1) @ np.delete(self.coef,i+1,axis=0) + self.beta[0], 'o', label='Dim. '.format(i+1)) # A esta es la que le tengo que restar
+        for i in range(self.N-1):
+            ax.plot(self.X[:,i+1], self.X[:,i+1] * self.beta[i+1] + self.beta[0], 'k')
+        ax.plot(self.X[:,self.N], self.X[:,self.N] * self.beta[self.N] + self.beta[0], 'k', label="Ajuste")
+    
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])        
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        ax.set_xlabel("X", fontsize=15)
+        ax.set_ylabel("Y", fontsize=15)
         if(save):
             plt.savefig('Informe/1_Todos.pdf', format='pdf', bbox_inches='tight')
         plt.show()
     
     def plotDim(self,i, save=True):
-        plt.plot(self.X[:,i], self.Y_noise, 'ob')
-        #plt.plot(self.X[:,i], self.Y, 'or')
-        plt.plot(self.X[:,i], self.X[:,[0,i]] @ self.coef[[0,i]], 'o', label="Dim. "+str(i+1))
-        plt.plot(self.X[:,i], self.X[:,i] * self.beta[i] + self.beta[0], '--k', label="ajuste" + str(8))
-        plt.plot(self.X[:,i], self.X[:,i] * self.coef[i] + self.coef[0], '--g', label="posta")
-        plt.legend(loc="best")
-        plt.xlabel("X", fontsize=15)
-        plt.ylabel("Y", fontsize=15)
+        fig = plt.figure()
+        ax = plt.subplot(111)
+
+        ax.plot(self.X[:,i], self.Y_noise - np.delete(self.X,i,axis=1) @ np.delete(self.coef,i,axis=0) + self.beta[0], 'or', label='Dim. {}'.format(i))
+        ax.plot(self.X[:,i], self.X[:,i] * self.beta[i] + self.beta[0], '--k', label='Ajuste {}'.format(i))
+        ax.legend(loc="best")
+        ax.set_xlabel("X", fontsize=15)
+        ax.set_ylabel("Y", fontsize=15)
         if(save):
-            plt.savefig('Informe/1_UnaDimension.pdf', format='pdf', bbox_inches='tight')
+            plt.savefig('Informe/1_UnaDimension_{}.pdf'.format(i), format='pdf', bbox_inches='tight')
         plt.show()
     
     def getError(self):
         diff = self.coef - self.beta
-        return np.linalg.norm(diff)
+        return np.linalg.norm(diff[1:]) / (np.sqrt(self.N))
 
 
-def barrido_datos():
+def barridoDatos(save=True):
+    fig = plt.figure()
+    ax = plt.subplot(111)
+
+    numDatos = 50
+
+    for dim in range(10,numDatos,10):
+        log_error = []
+        fit= ajusteLineal(dim)
+        for i in range(dim,numDatos):
+            error = 0
+            for _ in range(100):
+                fit.randomData(i)
+                error += fit.getError()
+            log_error += [error/100.0]
+        
+        datos = np.arange(dim,numDatos)
+        log_error = np.array(log_error)
+        
+        ax.axvline(dim, color="gray", linestyle="--", )
+        ax.semilogy(datos, log_error, 'o', label='Dim. {}'.format(dim))
+
+
+    ax.legend(loc='best')
+    ax.set_xlabel("Cantidad de datos", fontsize=15)
+    ax.set_ylabel("Error", fontsize=15)
+
+    if(save):    
+        plt.savefig('Informe/1_Barrido_en_Datos.pdf', format='pdf', bbox_inches='tight')
+    plt.show()
+
+
+def barridoDim(save=True):
+    fig = plt.figure(figsize=(7.4,4.8))
+    ax = plt.subplot(111)
+
+    for nDatos in range(40, 9, -10):
+        log_error = []
+        for dim in range(1,nDatos+1):
+            fit = ajusteLineal(dim)
+            error = 0
+            for _ in range(100):
+                fit.randomData(nDatos)
+                error += fit.getError()
+            log_error += [error/100.0]
+        
+        dimension = np.arange(1,nDatos+1)
+        log_error = np.array(log_error)
+
+        ax.axvline(nDatos, color="gray", linestyle="--")
+        ax.semilogy(dimension, log_error, 'o', label='N° Datos = {}'.format(nDatos))
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])        
+    ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+    ax.set_xlabel("Dimension", fontsize=15)
+    ax.set_ylabel("Error", fontsize=15)
+
     
-
-
-"""
-n = 100 # Numeros de datos
-p = 1   # Dimension
-
-A = np.random.uniform(-1, 1, size=(p+1,1) )
-
-X = np.random.uniform(0, 100, size=(n,p) )
-
-#print(X)
-X = np.hstack( (np.ones((n,1)), X) )
-
-Y = X @ A
-
-ruido = np.random.normal(0, 1, size=Y.shape)
-
-Y_ruido = Y + ruido
-
-
-beta = np.linalg.inv(X.T @ X) @ X.T @ Y_ruido
+    if(save):
+        plt.savefig('Informe/1_Barido_en_Dimension.pdf', format='pdf', bbox_inches='tight')
+    plt.show()
 
 
 
-X_plot = np.linspace(-100,100,10000)
-
-plt.plot(X[:,1] , Y_ruido, 'ro')
-plt.plot(X[:,1] , Y, 'bo')
-plt.plot(X_plot , beta[0] + beta[1]*X_plot, '-y')
-plt.show()
-"""
 
 
 
-"""
-N = 5   # Dimension
-#coef = np.random.randint(-5,5,(N+1,1))
-coef = np.random.uniform(-5,5,(N+1,1))
-
-M = 5000   # Numero de datos
-x = np.random.uniform(0, 100, size=(M,N))
-
-
-
-x = np.hstack((np.ones((M,1)),x))   # Agrego 1 para el bias
-
-
-# y = coef @ x
-y = x @ coef
-
-noise = np.random.normal(0, 10, size=y.shape)
-
-y_noise = y + noise
-
-beta = np.linalg.inv(x.T @ x) @ x.T @ y_noise
-"""
-
-"""
-
-for i in range(N):
-    print(i)
-    plt.plot(x[:,i+1], y_noise, 'o')
-    plt.plot(x[:,i+1], x[:,i+1] * beta[i+1] + beta[0], 'k')
-#plt.plot(x[:,1], y, 'ob')
-plt.show()
-
-
-plt.plot(x[:,1], y_noise, 'ob')
-plt.plot(x[:,1], y, 'or')
-plt.plot(x[:,1], x[:,1] * beta[1] + beta[0], '--k', label="ajuste" + str(8))
-plt.plot(x[:,1], x[:,1] * coef[1] + coef[0], '--g', label="posta")
-plt.legend(loc="best")
-plt.show()
-
-"""
-
-
-"""
 
 kk = ajusteLineal(5)
-kk.RandomData(100)
+kk.randomData(100,std=5)
 kk.plotAll()
+kk.plotDim(3)
 
-for i in range(2):
-    kk.plotDim(i+1)
+barridoDatos()
 
-"""
+barridoDim()
 
-
-
-# Formula para minimzar el error cuadratico medio (MCO):
-# $\beta = (X^{T}X)^{-1}X^{T}Y$
-
-#X = np.array([np.ones(M), x])
-# X = np.array([np.ones(len(X)), X]).T
-
-#y = coef @ X
-
-#plt.plot(, )
-
-
-
-#################
-# X = np.random.uniform(size=(10,3))
-# n,m = X.shape # for generality
-#X0 = np.ones((1,M))
-#Xnew = np.vstack((X0,x))
