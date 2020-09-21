@@ -47,7 +47,7 @@ class Tanh(Activation):
     def __call__(self, x_):
         return np.tanh(x_)
     
-    def gradient(self, x_);
+    def gradient(self, x_):
         return 1 - np.tanh(x_)**2
 
 class LeakyRelu(Activation):
