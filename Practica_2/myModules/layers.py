@@ -41,32 +41,31 @@ class Input(BaseLayer):
         pass
 
 class ConcatInput(BaseLayer):
-    def __init__(self):
-        #Completar
-        pass
+    def __init__(self, layerX, layerS):
+        # XXX Pasar layer o el numero de columnas?
+        self.X_shape = layerX.get_output_shape()
+        self.S_shape = layerS.get_output_shape()
+        self.out_shape = self.X_shape + self.S_shape
 
-    def __call__(self):
-        #Completar
-        pass
-
-    def set_output_shape(self):
-        #Completar
-        pass
+    def __call__(self,X,S):
+        return np.hstack( (X,S) )
 
     def get_output_shape(self):
-        #Completar
-        pass
+        return self.out_shape
 
     def get_input1_shape(self):
-        #Completar
-        pass
+        return self.X_shape
 
     def get_input2_shape(self):
-        #Completar
+        return self.S_shape
+
+    def set_output_shape(self):
+        # XXX WTF
         pass
 
 class WLayer(BaseLayer):
     def __init__(self, nraws, units, activation=act.Linear, regu=reg.L2, w = 1e-3):
+        # XXX Se puede pasar el layer en vez del numero de columnas y hacer un get_shape
         self.shape = [nraws, units]
         self.activation = activation
         self.reg = regu
