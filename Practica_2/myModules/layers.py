@@ -28,27 +28,29 @@ class BaseLayer(object):
         pass
 
 class Input(BaseLayer):
-    def __init__(self):
-        #Completar
-        pass
+    def __init__(self,x_shape):
+        self.out_shape = x_shape
+    
+    def __call__(self,X):
+        return X
 
     def get_output_shape(self):
-        #Completar
-        pass
+        return self.out_shape
 
     def set_output_shape(self):
-        #Completar
+        # XXX WTF
         pass
 
+    
+
 class ConcatInput(BaseLayer):
-    def __init__(self, layerX, layerS):
+    def __init__(self, layerX):
         # XXX Pasar layer o el numero de columnas?
         self.X_shape = layerX.get_output_shape()
-        self.S_shape = layerS.get_output_shape()
-        self.out_shape = self.X_shape + self.S_shape
+        # self.S_shape = layerS.get_output_shape()
 
     def __call__(self,X,S):
-        return np.hstack( (X,S) )
+        return np.hstack( (S,X) )       # X es el reinyectado
 
     def get_output_shape(self):
         return self.out_shape
@@ -58,29 +60,76 @@ class ConcatInput(BaseLayer):
 
     def get_input2_shape(self):
         return self.S_shape
+    
+    def set_input_shape(self,S_shape):
+        self.S_shape = S_shape
+        self.out_shape = self.X_shape + self.S_shape
 
     def set_output_shape(self):
         # XXX WTF
         pass
 
-class WLayer(BaseLayer):
-    def __init__(self, nraws, units, activation=act.Linear, regu=reg.L2, w = 1e-3):
-        # XXX Se puede pasar el layer en vez del numero de columnas y hacer un get_shape
-        self.shape = [nraws, units]
-        self.activation = activation
-        self.reg = regu
+    
 
-        self.W = np.random.uniform(-w,w, size=(self.shape[0]+1 , self.shape[1]) )
-
-    def get_input_shape(self):
-        return self.shape[0]
+class Concat(BaseLayer):
+    def __init__(self, layerS2, forward, iS2 = 0):
+    # def __init__(self, layerS1, layerS2, forward, iS2 = 0):
+        # self.S1_shape = 0
+        # self.S1_shape = layerS1.get_output_shape()
+        self.S2_shape = layerS2.get_output_shape()
+        self.forward = forward
+        self.i = iS2
+    
+    def __call__(self,X,S1):
+        S2 = self.forward(X,self.i+1)           # XXX Tenemos dudas del +1
+        return np.hstack( (S1,S2) )             # S2 es el reinyectado
+    
+    # def __call__(self,X):
+    #     S = self.forward(self.i)
+    #     return np.hstack( (X,S) )
     
     def get_output_shape(self):
-        return self.shape[1]
-
-    def set_input_shape(self):
-        #Completar WTF
+        return self.out_shape
+    
+    def get_input1_shape(self):
+        return self.S1_shape
+    
+    def get_input2_shape(self):
+        return self.S2_shape
+    
+    def set_output_shape(self):
+        # XXX WTF
         pass
+
+    def set_input_shape(self,S1_shape):
+        self.S1_shape = S1_shape
+        self.out_shape = self.S1_shape + self.S2_shape
+    
+
+
+
+
+class WLayer(BaseLayer):
+    def __init__(self, units, activation=act.Linear(), regu=reg.L2(), w = 1e-3, nraws=None):
+        # XXX Se puede pasar el layer en vez del numero de columnas y hacer un get_shape
+        self.in_shape = nraws
+        self.out_shape = units
+        self.activation = activation
+        self.reg = regu
+        self.w = w
+
+    def __initW(self):
+        self.W = np.random.uniform(-self.w,self.w, size=(self.in_shape+1 , self.out_shape) )
+
+    def get_input_shape(self):
+        return self.in_shape
+    
+    def get_output_shape(self):
+        return self.out_shape
+
+    def set_input_shape(self,in_shape):
+        self.in_shape = in_shape
+        self.__initW()
 
     def set_output_shape(self):
         ####### WTF
@@ -89,14 +138,12 @@ class WLayer(BaseLayer):
     def get_weights(self):
         return self.W
 
-    def update_weights(self):
-        # Completar
-        pass
-
+    def update_weights(self, dW):
+        self.W -= dW
 
 class Dense(WLayer):
-    def __init__(self, nraws, units, activation=act.Linear, regu=reg.L2, w = 1e-3):
-        super().__init__(nraws, units, activation, regu, w)
+    def __init__(self, units, activation=act.Linear(), regu=reg.L2(), w = 1e-3, nraws=None):
+        super().__init__(units, activation, regu, w, nraws)
     
     def __call__(self,X):
         return self.activation(self.dot(X))
