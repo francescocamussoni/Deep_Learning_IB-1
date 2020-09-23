@@ -32,7 +32,7 @@ class MSE(Loss):
         return ((scores-yy)**2).sum(axis=1).mean()
     
     def gradient(self, scores, y_true):
-        yy = self.__yyZeros(y_true)
+        yy = self.__yyZeros(y_true, scores.shape)
         return 2*(scores-yy)/len(y_true)
 
 class MSE_XOR(Loss):

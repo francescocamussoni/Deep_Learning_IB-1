@@ -119,6 +119,7 @@ class WLayer(BaseLayer):
         self.w = w
 
     def __initW(self):
+        # import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
         self.W = np.random.uniform(-self.w,self.w, size=(self.in_shape+1 , self.out_shape) )
 
     def get_input_shape(self):
@@ -128,6 +129,7 @@ class WLayer(BaseLayer):
         return self.out_shape
 
     def set_input_shape(self,in_shape):
+        # import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
         self.in_shape = in_shape
         self.__initW()
 

@@ -24,6 +24,7 @@ def mse(scores, y_true):
     return ((scores-yy)**2).sum(axis=1).mean()
 
 def accuracy(scores, y_true):
+    # import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
     y_predict = np.argmax(scores, axis=1)
     return (y_predict == y_true).mean()*100
 
@@ -31,4 +32,4 @@ def acc_XOR(scores, y_true):
 	S = np.copy(scores)
 	S[S>0.9]  =  1
 	S[S<-0.9] = -1
-	return (scores == y_true).mean()*100
+	return (S == y_true).mean()*100
