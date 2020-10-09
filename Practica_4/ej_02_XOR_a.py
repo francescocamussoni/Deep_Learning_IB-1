@@ -49,7 +49,6 @@ def my_acc(y_true, y_pred):
 model.compile(
     optimizer=optimizers.SGD(learning_rate=1e-2),
     loss=losses.MSE,
-    #   loss=losses.MeanSquaredError(),
     metrics=[my_acc])
 
 model.summary()
@@ -70,27 +69,22 @@ if not os.path.exists(img_folder):
 
 # Grafico
 plt.plot(history.history['loss'], label="Loss")
-# plt.plot(history.history['val_loss'], label="Loss Test")
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
-# plt.axis("equal")
-plt.savefig(os.path.join(img_folder, '2_Loss_Softmax.pdf'),
+plt.savefig(os.path.join(img_folder, '2_Loss_XOR_A.pdf'),
             format="pdf",
             bbox_inches="tight")
-# plt.show()
 plt.close()
 
 plt.plot(history.history['my_acc'], label="Accuracy")
-# plt.plot(history.history['val_accuracy'], label="Acc. Test")
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
 # plt.axis("equal")
-plt.savefig(os.path.join(img_folder, '2_Acc_Softmax.pdf'),
+plt.savefig(os.path.join(img_folder, '2_Acc_XOR_A.pdf'),
             format="pdf",
             bbox_inches="tight")
 plt.close()
-# plt.show()

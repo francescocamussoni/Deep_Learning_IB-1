@@ -30,7 +30,8 @@ layer_1 = layers.Dense(1,
                        activation=activations.tanh,
                        use_bias=True)(inputs)
 
-concat = layers.Concatenate([inputs, layer_1])
+concat = layers.Concatenate()([inputs, layer_1])
+
 
 outputs = layers.Dense(1,
                        name='Output',
@@ -49,7 +50,7 @@ def my_acc(y_true, y_pred):
 
 
 model.compile(
-    optimizer=optimizers.SGD(learning_rate=1e-2),
+    optimizer=optimizers.SGD(learning_rate=1e-1),
     loss=losses.MSE,
     #   loss=losses.MeanSquaredError(),
     metrics=[my_acc])
