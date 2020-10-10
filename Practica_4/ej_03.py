@@ -40,8 +40,8 @@ parser.add_argument(
     "-rf",
     "--regularizer_factor",
     type=float,
-    default=1e-1,
-    help="Regularizer factor (default: 1e-1)",
+    default=0,
+    help="Regularizer factor (default: 0)",
 )
 parser.add_argument(
     "-e",
@@ -62,6 +62,8 @@ lr = kwargs["learning_rate"]
 rf = kwargs["regularizer_factor"]
 epochs = kwargs['epochs']
 batch_size = kwargs['batch_size']
+
+print('lr: {} rf: {} epochs: {} bs: {}'.format(lr, rf, epochs, batch_size))
 
 # importo los datos
 dim = 10000
@@ -126,8 +128,7 @@ model = keras.models.Model(inputs=inputs,
 model.compile(optimizer=optimizers.SGD(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
               metrics=[
-                  metrics.BinaryAccuracy(name='B_Acc'),
-                  metrics.Accuracy(name='Acc')
+                  metrics.BinaryAccuracy(name='B_Acc')
               ])
 
 model.summary()
@@ -170,19 +171,6 @@ plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
     'Loss_Regul_lr={}_rf={}_e={}_bs={}.pdf'.format(lr, rf, epochs, batch_size)),
-            format="pdf",
-            bbox_inches="tight")
-plt.close()
-
-plt.plot(history.history['Acc'], label="Acc. Training")
-plt.plot(history.history['val_Acc'], label="Acc. Test")
-plt.xlabel("Epocas", fontsize=15)
-plt.ylabel("Accuracy", fontsize=15)
-plt.legend(loc='best')
-plt.tight_layout()
-plt.savefig(os.path.join(
-    img_folder,
-    'Acc_Regul_lr={}_rf={}_e={}_bs={}.pdf'.format(lr, rf, epochs, batch_size)),
             format="pdf",
             bbox_inches="tight")
 plt.close()
