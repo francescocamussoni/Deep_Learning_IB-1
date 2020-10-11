@@ -71,7 +71,8 @@ epochs = kwargs['epochs']
 batch_size = kwargs['batch_size']
 drop_arg = kwargs['Dropout']
 
-print('lr: {} rf: {} epochs: {} bs: {}'.format(lr, rf, epochs, batch_size))
+print('lr: {} rf: {} do: {} epochs: {} bs: {}'.format(lr, rf, drop_arg, epochs,
+                                                      batch_size))
 
 # importo los datos
 dim = 10000
