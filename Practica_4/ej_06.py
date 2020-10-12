@@ -52,7 +52,7 @@ parser.add_argument(
     help="Epochs (default: 200)",
 )
 parser.add_argument(
-    "-bz",
+    "-bs",
     "--batch_size",
     type=int,
     default=None,
@@ -65,12 +65,20 @@ parser.add_argument(
     default=1,
     help="Dropout argument (default: 0)",
 )
+parser.add_argument(
+    "-nn",
+    "--NumNeuronas",
+    type=int,
+    default=10,
+    help="Numero de neuronas (default: 10)",
+)
 kwargs = vars(parser.parse_args())
 lr = kwargs["learning_rate"]
 rf = kwargs["regularizer_factor"]
 epochs = kwargs['epochs']
 batch_size = kwargs['batch_size']
 drop_arg = kwargs['Dropout']
+nn = kwargs['NumNeuronas']
 
 print("-------------------------------------")
 print('lr: {} rf: {} do: {} epochs: {} bs: {}'.format(lr, rf, drop_arg, epochs,
@@ -78,12 +86,12 @@ print('lr: {} rf: {} do: {} epochs: {} bs: {}'.format(lr, rf, drop_arg, epochs,
 print("-------------------------------------")
 
 # Cargo los datos
-# Probar esto desde el cluster
-# path_folder = os.path.join("share","apps","DeepLearning","Datos")
-# file = "pima-indians-diabetes.csv"
-# path_file = os.path.join(path_folder, file)
+# Probar esto desde el cluster. Edit: Parece que funciona
+path_folder = os.path.join("/","share","apps","DeepLearning","Datos")
+file = "pima-indians-diabetes.csv"
+path_file = os.path.join(path_folder, file)
 
-path_file = '/run/user/1000/gvfs/sftp:host=10.73.25.223,user=facundo.cabrera/share/apps/DeepLearning/Datos/pima-indians-diabetes.csv'
+# path_file = '/run/user/1000/gvfs/sftp:host=10.73.25.223,user=facundo.cabrera/share/apps/DeepLearning/Datos/pima-indians-diabetes.csv'
 
 data = np.loadtxt(path_file, delimiter=',')
 
@@ -92,13 +100,13 @@ y = data[:, -1].reshape((data.shape[0], 1))
 
 inputs = layers.Input(shape=(x.shape[1], ), name="Input")
 
-layer_1 = layers.Dense(10,
+layer_1 = layers.Dense(nn,
                        activation=activations.relu,
                        use_bias=True,
                        kernel_regularizer=regularizers.l2(rf),
                        name="Hidden_1")(inputs)
 
-layer_2 = layers.Dense(10,
+layer_2 = layers.Dense(nn,
                        activation=activations.relu,
                        use_bias=True,
                        kernel_regularizer=regularizers.l2(rf),
@@ -118,10 +126,11 @@ model.compile(optimizer=optimizers.SGD(learning_rate=lr),
 model.summary()
 
 # Guardo los pesos para cargarlos y "ressetear" el modelo en cada fold
-data_folder = os.path.join('Datos', '5')
+data_folder = os.path.join('Datos', '6')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
-model.save_weights('modelo_SIN_entrenar.h5')
+save_weights = os.path.join(data_folder,"modelo_SIN_entrenar.h5")
+model.save_weights(save_weights)
 
 # 5-folding de los datos
 kf = KFold(n_splits=5, shuffle=True)
@@ -141,7 +150,7 @@ for train_index, test_index in kf.split(idx):
     y_train, y_test = y[train_index], y[test_index]
 
     # Cargo los pesos del modelo sin entrenar
-    model.load_weights('modelo_SIN_entrenar.h5')
+    model.load_weights(save_weights)
 
     # Entreno
     history = model.fit(x_train,
@@ -162,6 +171,8 @@ for train_index, test_index in kf.split(idx):
 
     # kkparachequear = idx[test_index]
     # check = np.append(check, kkparachequear)
+
+os.remove(save_weights)
 
 acc_test = acc_test.reshape( (5, epochs) )
 acc_train = acc_train.reshape( (5, epochs) )
@@ -208,8 +219,8 @@ plt.savefig(os.path.join(
                                                    batch_size)),
             format="pdf",
             bbox_inches="tight")
-plt.show()
-# plt.close()
+# plt.show()
+plt.close()
 
 # Grafico
 plt.fill_between(xx, results['test_min'], results['test_max'], alpha=0.2)
@@ -226,13 +237,13 @@ plt.savefig(os.path.join(
                                                    batch_size)),
             format="pdf",
             bbox_inches="tight")
-plt.show()
-# plt.close()
+# plt.show()
+plt.close()
 
 plt.fill_between(xx, results['ltrain_min'], results['ltrain_max'], alpha=0.2)
 plt.plot(results['ltrain_mean'], '-', label="Loss")
-plt.fill_between(xx, ['ltest_min'], ['ltest_max'], alpha=0.2)
-plt.plot(['ltest_mean'], '-', label="Loss Test")
+plt.fill_between(xx, results['ltest_min'], results['ltest_max'], alpha=0.2)
+plt.plot(results['ltest_mean'], '-', label="Loss Test")
 # plt.plot(history.history['loss'], label="Loss")
 # plt.plot(history.history['val_loss'], label="Loss Test")
 plt.xlabel("Epocas", fontsize=15)
@@ -245,6 +256,7 @@ plt.savefig(os.path.join(
                                                    batch_size)),
             format="pdf",
             bbox_inches="tight")
+# plt.show()
 plt.close()
 
 # check.sort()    # Si todo esta bien esto deberia tener todos los enteros de 0 a x.shape sin repetir
