@@ -81,13 +81,13 @@ drop_arg = kwargs['Dropout']
 nn = kwargs['NumNeuronas']
 
 print("-------------------------------------")
-print('lr: {} rf: {} do: {} epochs: {} bs: {} nn: {}'.format(lr, rf, drop_arg, epochs,
-                                                      batch_size, nn))
+print('lr: {} rf: {} do: {} epochs: {} bs: {} nn: {}'.format(
+    lr, rf, drop_arg, epochs, batch_size, nn))
 print("-------------------------------------")
 
 # Cargo los datos
 # Probar esto desde el cluster. Edit: Parece que funciona
-path_folder = os.path.join("/","share","apps","DeepLearning","Datos")
+path_folder = os.path.join("/", "share", "apps", "DeepLearning", "Datos")
 file = "pima-indians-diabetes.csv"
 path_file = os.path.join(path_folder, file)
 
@@ -129,7 +129,7 @@ model.summary()
 data_folder = os.path.join('Datos', '6')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
-sv = os.path.join(data_folder,"modelo_SIN_entrenar.h5")
+sv = os.path.join(data_folder, "modelo_SIN_entrenar.h5")
 model.save_weights(sv)
 
 # 5-folding de los datos
@@ -159,45 +159,45 @@ for train_index, test_index in kf.split(idx):
                         epochs=epochs,
                         batch_size=batch_size,
                         verbose=2)
-    
-    acc_test = np.concatenate((acc_test, history.history['val_Acc'] ))
-    acc_train = np.concatenate((acc_train, history.history['Acc'] ))
 
-    loss_test = np.concatenate((loss_test, history.history['loss'] ))
-    loss_train = np.concatenate((loss_train, history.history['val_loss'] ))
+    acc_test = np.concatenate((acc_test, history.history['val_Acc']))
+    acc_train = np.concatenate((acc_train, history.history['Acc']))
+
+    loss_test = np.concatenate((loss_test, history.history['loss']))
+    loss_train = np.concatenate((loss_train, history.history['val_loss']))
 
     # acc_test = np.vstack( (acc_test, history.history['val_Acc']) )
-
 
     # kkparachequear = idx[test_index]
     # check = np.append(check, kkparachequear)
 
-# os.remove(sv)
+# os.remove(sv)     # esto me genera problemas. No se bien porque
 
-acc_test = acc_test.reshape( (5, epochs) )
-acc_train = acc_train.reshape( (5, epochs) )
-loss_test = acc_train.reshape( (5, epochs) )
-loss_train = acc_train.reshape( (5, epochs) )
+acc_test = acc_test.reshape((5, epochs))
+acc_train = acc_train.reshape((5, epochs))
+loss_test = acc_train.reshape((5, epochs))
+loss_train = acc_train.reshape((5, epochs))
+
 
 def toDictionary(va, a, vl, l):
 
-    res ={'test_min' : va.min(axis=0),
-    'test_max' : va.max(axis=0),
-    'test_mean' : va.mean(axis=0),
-
-    'train_min' : a.min(axis=0),
-    'train_max' : a.max(axis=0),
-    'train_mean' : a.mean(axis=0),
-
-    'ltest_min' : vl.min(axis=0),
-    'ltest_max' : vl.max(axis=0),
-    'ltest_mean' : vl.mean(axis=0),
-
-    'ltrain_min' : l.min(axis=0),
-    'ltrain_max' : l.max(axis=0),
-    'ltrain_mean' : l.mean(axis=0)}
+    res = {
+        'test_min': va.min(axis=0),
+        'test_max': va.max(axis=0),
+        'test_mean': va.mean(axis=0),
+        'train_min': a.min(axis=0),
+        'train_max': a.max(axis=0),
+        'train_mean': a.mean(axis=0),
+        'ltest_min': vl.min(axis=0),
+        'ltest_max': vl.max(axis=0),
+        'ltest_mean': vl.mean(axis=0),
+        'ltrain_min': l.min(axis=0),
+        'ltrain_max': l.max(axis=0),
+        'ltrain_mean': l.mean(axis=0)
+    }
 
     return res
+
 
 results = toDictionary(acc_test, acc_train, loss_test, loss_train)
 
@@ -215,8 +215,7 @@ plt.ylabel("Accuracy", fontsize=15)
 plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
-    'Acc_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs,
-                                                   batch_size)),
+    'Acc_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs, batch_size)),
             format="png",
             bbox_inches="tight")
 # plt.show()
@@ -233,8 +232,7 @@ plt.ylabel("Test Accuracy", fontsize=15)
 plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
-    'Acc_Test_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs,
-                                                   batch_size)),
+    'Acc_Test_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs, batch_size)),
             format="png",
             bbox_inches="tight")
 # plt.show()

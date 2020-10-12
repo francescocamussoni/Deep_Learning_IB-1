@@ -76,7 +76,6 @@ model = keras.models.Model(inputs=inputs,
 
 optimizer = keras.optimizers.SGD(learning_rate=1e-3)
 
-
 model.compile(
     optimizer=optimizer,
     loss=keras.losses.CategoricalCrossentropy(from_logits=True),
