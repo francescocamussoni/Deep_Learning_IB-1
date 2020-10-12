@@ -78,7 +78,7 @@ print('lr: {} rf: {} do: {} epochs: {} bs: {}'.format(lr, rf, drop_arg, epochs,
                                                       batch_size))
 print("-------------------------------------")
 
-s
+
 # Cargo los datos
 # Probar esto desde el cluster
 # path_folder = os.path.join("share","apps","DeepLearning","Datos")
@@ -125,13 +125,11 @@ model.compile(optimizer=optimizers.SGD(learning_rate=lr),
 
 model.summary()
 
-
-
-
-
-
-
-
+# Guardo los pesos para cargarlos y "ressetear" el modelo en cada fold
+data_folder = os.path.join('Datos', '5')
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+model.save_weights('modelo_din_entrenar.h5')
 
 
 
@@ -141,15 +139,26 @@ kf = KFold(n_splits=5, shuffle=True)
 
 # idx = np.arange(20)
 idx = np.arange(x.shape[0])
-
 # check = np.array([])
 
 for train_index, test_index in kf.split(idx):
-    # print("TRAIN:", train_index, "TEST:", test_index)
+
     x_train, x_test = x[train_index], x[test_index]
     y_train, y_test = y[train_index], y[test_index]
-    # print("x_train: ", x_train)
-    # print("x_test : ", x_test)
-    # check = np.append(check, x_test)
 
-# check.sort()
+    # Cargo los pesos del modelo sin entrenar
+    model.load_weights('model.h5')
+
+    # Entreno
+    history = model.fit(x_train,
+                    y_train,
+                    validation_data=(x_test, y_test),
+                    epochs=epochs,
+                    batch_size=batch_size,
+                    verbose=2)
+
+
+    # kkparachequear = idx[test_index]
+    # check = np.append(check, kkparachequear)
+
+# check.sort()    # Si todo esta bien esto deberia tener todos los enteros de 0 a x.shape sin repetir
