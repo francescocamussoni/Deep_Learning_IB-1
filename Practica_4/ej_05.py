@@ -151,9 +151,9 @@ plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
-    'Loss_lr={}_rf={}_do={}_e={}_bs={}.pdf'.format(lr, rf, drop_arg, epochs,
+    'Loss_lr={}_rf={}_do={}_e={}_bs={}.png'.format(lr, rf, drop_arg, epochs,
                                                    batch_size)),
-            format="pdf",
+            format="png",
             bbox_inches="tight")
 plt.close()
 
@@ -164,8 +164,8 @@ plt.ylabel("Accuracy", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(
-    img_folder, 'Acc_Dropout_lr={}_rf={}_do={}_e={}_bs={}.pdf'.format(
+    img_folder, 'Acc_Dropout_lr={}_rf={}_do={}_e={}_bs={}.png'.format(
         lr, rf, drop_arg, epochs, batch_size)),
-            format="pdf",
+            format="png",
             bbox_inches="tight")
 plt.close()

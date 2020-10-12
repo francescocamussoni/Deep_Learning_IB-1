@@ -76,8 +76,8 @@ plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(img_folder, '2_Loss_XOR_B.pdf'),
-            format="pdf",
+plt.savefig(os.path.join(img_folder, '2_Loss_XOR_B.png'),
+            format="png",
             bbox_inches="tight")
 plt.close()
 
@@ -86,7 +86,7 @@ plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(img_folder, '2_Acc_XOR_B.pdf'),
-            format="pdf",
+plt.savefig(os.path.join(img_folder, '2_Acc_XOR_B.png'),
+            format="png",
             bbox_inches="tight")
 plt.close()

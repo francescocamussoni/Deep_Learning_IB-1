@@ -167,9 +167,9 @@ plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
-    'Loss_Regul_lr={}_rf={}_e={}_bs={}.pdf'.format(lr, rf, epochs,
+    'Loss_Regul_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs,
                                                    batch_size)),
-            format="pdf",
+            format="png",
             bbox_inches="tight")
 plt.close()
 
@@ -181,8 +181,8 @@ plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
-    'B_Acc_Regul_lr={}_rf={}_e={}_bs={}.pdf'.format(lr, rf, epochs,
+    'B_Acc_Regul_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs,
                                                     batch_size)),
-            format="pdf",
+            format="png",
             bbox_inches="tight")
 plt.close()
