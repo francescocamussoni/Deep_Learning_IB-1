@@ -129,8 +129,8 @@ model.summary()
 data_folder = os.path.join('Datos', '6')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
-save_weights = os.path.join(data_folder,"modelo_SIN_entrenar.h5")
-model.save_weights(save_weights)
+sv = os.path.join(data_folder,"modelo_SIN_entrenar.h5")
+model.save_weights(sv)
 
 # 5-folding de los datos
 kf = KFold(n_splits=5, shuffle=True)
@@ -150,7 +150,7 @@ for train_index, test_index in kf.split(idx):
     y_train, y_test = y[train_index], y[test_index]
 
     # Cargo los pesos del modelo sin entrenar
-    model.load_weights(save_weights)
+    model.load_weights(sv)
 
     # Entreno
     history = model.fit(x_train,
@@ -172,7 +172,7 @@ for train_index, test_index in kf.split(idx):
     # kkparachequear = idx[test_index]
     # check = np.append(check, kkparachequear)
 
-os.remove(save_weights)
+# os.remove(sv)
 
 acc_test = acc_test.reshape( (5, epochs) )
 acc_train = acc_train.reshape( (5, epochs) )
