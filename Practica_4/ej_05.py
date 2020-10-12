@@ -51,7 +51,7 @@ parser.add_argument(
     help="Epochs (default: 200)",
 )
 parser.add_argument(
-    "-bz",
+    "-bs",
     "--batch_size",
     type=int,
     default=None,
