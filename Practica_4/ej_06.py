@@ -81,8 +81,8 @@ drop_arg = kwargs['Dropout']
 nn = kwargs['NumNeuronas']
 
 print("-------------------------------------")
-print('lr: {} rf: {} do: {} epochs: {} bs: {}'.format(lr, rf, drop_arg, epochs,
-                                                      batch_size))
+print('lr: {} rf: {} do: {} epochs: {} bs: {} nn: {}'.format(lr, rf, drop_arg, epochs,
+                                                      batch_size, nn))
 print("-------------------------------------")
 
 # Cargo los datos
