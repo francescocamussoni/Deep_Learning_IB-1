@@ -28,7 +28,6 @@ from tensorflow.keras import (
     optimizers,
 )
 
-
 # Argumentos por linea de comandos
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -78,7 +77,6 @@ print('lr: {} rf: {} do: {} epochs: {} bs: {}'.format(lr, rf, drop_arg, epochs,
                                                       batch_size))
 print("-------------------------------------")
 
-
 # Cargo los datos
 # Probar esto desde el cluster
 # path_folder = os.path.join("share","apps","DeepLearning","Datos")
@@ -89,10 +87,8 @@ path_file = '/run/user/1000/gvfs/sftp:host=10.73.25.223,user=facundo.cabrera/sha
 
 data = np.loadtxt(path_file, delimiter=',')
 
-x = data[:,:-1]
-y = data[:,-1].reshape((data.shape[0],1))
-
-
+x = data[:, :-1]
+y = data[:, -1].reshape((data.shape[0], 1))
 
 inputs = layers.Input(shape=(x.shape[1], ), name="Input")
 
@@ -113,15 +109,11 @@ outputs = layers.Dense(1,
                        use_bias=True,
                        name="Output")(layer_2)
 
-model = keras.models.Model(inputs=inputs,
-                           outputs=outputs,
-                           name="Ejercicio_6")
+model = keras.models.Model(inputs=inputs, outputs=outputs, name="Ejercicio_6")
 
 model.compile(optimizer=optimizers.SGD(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
-              metrics=[
-                  metrics.BinaryAccuracy(name='Acc')
-              ])
+              metrics=[metrics.BinaryAccuracy(name='Acc')])
 
 model.summary()
 
@@ -130,9 +122,6 @@ data_folder = os.path.join('Datos', '5')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 model.save_weights('modelo_din_entrenar.h5')
-
-
-
 
 # 5-folding de los datos
 kf = KFold(n_splits=5, shuffle=True)
@@ -151,12 +140,11 @@ for train_index, test_index in kf.split(idx):
 
     # Entreno
     history = model.fit(x_train,
-                    y_train,
-                    validation_data=(x_test, y_test),
-                    epochs=epochs,
-                    batch_size=batch_size,
-                    verbose=2)
-
+                        y_train,
+                        validation_data=(x_test, y_test),
+                        epochs=epochs,
+                        batch_size=batch_size,
+                        verbose=2)
 
     # kkparachequear = idx[test_index]
     # check = np.append(check, kkparachequear)

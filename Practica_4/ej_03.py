@@ -127,9 +127,7 @@ model = keras.models.Model(inputs=inputs,
 
 model.compile(optimizer=optimizers.SGD(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
-              metrics=[
-                  metrics.BinaryAccuracy(name='B_Acc')
-              ])
+              metrics=[metrics.BinaryAccuracy(name='B_Acc')])
 
 model.summary()
 
@@ -148,13 +146,12 @@ if not os.path.exists(data_folder):
 model.save(
     os.path.join(
         data_folder,
-        'Regul_lr={}_rf={}_e={}_bs={}.h5'.format(lr, rf, epochs,
-                                                   batch_size)))
-np.save(    os.path.join(
+        'Regul_lr={}_rf={}_e={}_bs={}.h5'.format(lr, rf, epochs, batch_size)))
+np.save(
+    os.path.join(
         data_folder,
-        'Regul_lr={}_rf={}_e={}_bs={}.npy'.format(lr, rf, epochs,
-                                                    batch_size)),
-        history.history)
+        'Regul_lr={}_rf={}_e={}_bs={}.npy'.format(lr, rf, epochs, batch_size)),
+    history.history)
 
 # Guardo las imagenes
 img_folder = os.path.join('Figuras', '3')
@@ -170,7 +167,8 @@ plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
-    'Loss_Regul_lr={}_rf={}_e={}_bs={}.pdf'.format(lr, rf, epochs, batch_size)),
+    'Loss_Regul_lr={}_rf={}_e={}_bs={}.pdf'.format(lr, rf, epochs,
+                                                   batch_size)),
             format="pdf",
             bbox_inches="tight")
 plt.close()
@@ -183,7 +181,8 @@ plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
-    'B_Acc_Regul_lr={}_rf={}_e={}_bs={}.pdf'.format(lr, rf, epochs, batch_size)),
+    'B_Acc_Regul_lr={}_rf={}_e={}_bs={}.pdf'.format(lr, rf, epochs,
+                                                    batch_size)),
             format="pdf",
             bbox_inches="tight")
 plt.close()

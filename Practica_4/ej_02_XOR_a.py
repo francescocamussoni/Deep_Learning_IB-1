@@ -46,10 +46,9 @@ def my_acc(y_true, y_pred):
     return acc
 
 
-model.compile(
-    optimizer=optimizers.SGD(learning_rate=1e-2),
-    loss=losses.MSE,
-    metrics=[my_acc])
+model.compile(optimizer=optimizers.SGD(learning_rate=1e-2),
+              loss=losses.MSE,
+              metrics=[my_acc])
 
 model.summary()
 

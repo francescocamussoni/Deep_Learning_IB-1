@@ -32,7 +32,6 @@ layer_1 = layers.Dense(1,
 
 concat = layers.Concatenate()([inputs, layer_1])
 
-
 outputs = layers.Dense(1,
                        name='Output',
                        activation=activations.tanh,

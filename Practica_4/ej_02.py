@@ -29,17 +29,18 @@ x_test = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)
 y_train = y_train.reshape(y_train.size)
 y_test = y_test.reshape(y_test.size)
 
+
 def kk(y):
     res = np.zeros(shape=(y.shape[0], 10))
     res[np.arange(y.shape[0]), y] = 1
     return res
 
+
 y_train = kk(y_train)
-y_test  = kk(y_test)
+y_test = kk(y_test)
 
 y_train = keras.utils.to_categorical(y_train, 10)
-y_test  = keras.utils.to_categorical(y_test, 10)
-
+y_test = keras.utils.to_categorical(y_test, 10)
 
 # Resto la media y divido por sigma
 media = x_train.mean(axis=0)
@@ -53,25 +54,25 @@ x_test /= sigma
 # Input
 inputs = keras.layers.Input(shape=(x_train.shape[1], ), name="Input")
 
-l1 = keras.layers.Dense(
-    100,
-    name='Hidden_1',
-    activation=keras.activations.relu,
-    use_bias=True,
-    kernel_regularizer=keras.regularizers.l2(1e-2),
-    kernel_initializer=keras.initializers.RandomUniform(minval=0, maxval=1e-3, seed=None)
-)(inputs)
+l1 = keras.layers.Dense(100,
+                        name='Hidden_1',
+                        activation=keras.activations.relu,
+                        use_bias=True,
+                        kernel_regularizer=keras.regularizers.l2(1e-2),
+                        kernel_initializer=keras.initializers.RandomUniform(
+                            minval=0, maxval=1e-3, seed=None))(inputs)
 
 output = keras.layers.Dense(
     10,
     name='Output',
     use_bias=True,
     kernel_regularizer=keras.regularizers.l2(1e-2),
-    kernel_initializer=keras.initializers.RandomUniform(minval=0, maxval=1e-3, seed=None)
-)(l1)
-    # kernel_initializer=keras.initializers.RandomUniform(minval=-5e-2,
-    #                                                     maxval=5e-2,
-    #                                                     seed=None))(l1)
+    kernel_initializer=keras.initializers.RandomUniform(minval=0,
+                                                        maxval=1e-3,
+                                                        seed=None))(l1)
+# kernel_initializer=keras.initializers.RandomUniform(minval=-5e-2,
+#                                                     maxval=5e-2,
+#                                                     seed=None))(l1)
 
 model = keras.models.Model(inputs=inputs,
                            outputs=output,
@@ -79,13 +80,14 @@ model = keras.models.Model(inputs=inputs,
 
 optimizer = keras.optimizers.SGD(learning_rate=1e-3)
 
-model.compile(optimizer=optimizer,
-            #   loss=keras.losses.MSE,
-              loss='mse',
-            #   loss=keras.losses.binary_crossentropy,
-            #   metrics=[keras.metrics.BinaryAccuracy()])
-            #   metrics=[keras.metrics.Accuracy()])
-              metrics=['accuracy'])
+model.compile(
+    optimizer=optimizer,
+    #   loss=keras.losses.MSE,
+    loss='mse',
+    #   loss=keras.losses.binary_crossentropy,
+    #   metrics=[keras.metrics.BinaryAccuracy()])
+    #   metrics=[keras.metrics.Accuracy()])
+    metrics=['accuracy'])
 #   loss=keras.losses.categorical_crossentropy,
 # metrics=keras.metrics.Accuracy())
 
@@ -99,7 +101,6 @@ history = model.fit(x_train,
                     verbose=2)
 
 y_pred = model.predict(x_test)
-
 
 plt.plot(history.history['loss'], label="Loss Training")
 plt.plot(history.history['val_loss'], label="Loss Test")

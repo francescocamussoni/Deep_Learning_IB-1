@@ -107,11 +107,9 @@ outputs = layers.Dense(1,
 
 model = keras.models.Model(inputs=inputs, outputs=outputs, name='Ejercicio_5')
 
-model.compile(
-    optimizer=optimizers.SGD(learning_rate=lr),
-    loss=losses.MeanSquaredError(name='loss'),
-    metrics=[metrics.MeanSquaredError(name='acc_MSE')]
-)
+model.compile(optimizer=optimizers.SGD(learning_rate=lr),
+              loss=losses.MeanSquaredError(name='loss'),
+              metrics=[metrics.MeanSquaredError(name='acc_MSE')])
 
 model.summary()
 
@@ -123,19 +121,21 @@ history = model.fit(x_train,
                     batch_size=batch_size,
                     verbose=2)
 
-
 # Guardo los datos
 data_folder = os.path.join('Datos', '5')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 model.save(
     os.path.join(
-        data_folder, 'lr={}_rf={}_do={}_e={}_bs={}.h5'.format(
-            lr, rf, drop_arg, epochs, batch_size)))
+        data_folder,
+        'lr={}_rf={}_do={}_e={}_bs={}.h5'.format(lr, rf, drop_arg, epochs,
+                                                 batch_size)))
 np.save(
     os.path.join(
-        data_folder, 'lr={}_rf={}_do={}_e={}_bs={}.npy'.format(
-            lr, rf, drop_arg, epochs, batch_size)), history.history)
+        data_folder,
+        'lr={}_rf={}_do={}_e={}_bs={}.npy'.format(lr, rf, drop_arg, epochs,
+                                                  batch_size)),
+    history.history)
 
 # Guardo las imagenes
 img_folder = os.path.join('Figuras', '5')
@@ -150,8 +150,9 @@ plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(
-    img_folder, 'Loss_lr={}_rf={}_do={}_e={}_bs={}.pdf'.format(
-        lr, rf, drop_arg, epochs, batch_size)),
+    img_folder,
+    'Loss_lr={}_rf={}_do={}_e={}_bs={}.pdf'.format(lr, rf, drop_arg, epochs,
+                                                   batch_size)),
             format="pdf",
             bbox_inches="tight")
 plt.close()
