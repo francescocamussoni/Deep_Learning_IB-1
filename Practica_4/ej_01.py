@@ -65,13 +65,13 @@ history = model.fit(x_train,
 
 y_pred = model.predict(x_test)
 
-# plt.plot(y_pred, y_test, "ob", label="Predicciones")
-# plt.plot(y_test, y_test, "k", label="Target")
-# plt.xlabel("Precios reales [k$]",fontsize=15)
-# plt.ylabel("Precios predichos [k$]",fontsize=15)
-# # plt.axis("equal")
-# plt.savefig("Figuras/1.png", format="png", bbox_inches="tight")
-# plt.show()
+plt.plot(y_test, y_pred, "ob", label="Predicciones")
+plt.plot(y_test, y_test, "k", label="Target")
+plt.xlabel("Precios reales [k$]",fontsize=15)
+plt.ylabel("Precios predichos [k$]",fontsize=15)
+# plt.axis("equal")
+plt.savefig("Figuras/1.png", format="png", bbox_inches="tight")
+plt.show()
 
 plt.plot(history.history['loss'], label="Loss Training")
 plt.plot(history.history['val_loss'], label="Loss Test")
@@ -83,8 +83,8 @@ plt.tight_layout()
 plt.savefig("Figuras/2_Loss.png", format="png", bbox_inches="tight")
 plt.show()
 
-plt.plot(history.history['accuracy'], label="Acc. Training")
-plt.plot(history.history['val_accuracy'], label="Acc. Test")
+plt.plot(history.history['mse'], label="Acc. Training")
+plt.plot(history.history['val_mse'], label="Acc. Test")
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
 plt.legend(loc='best')
@@ -95,6 +95,6 @@ plt.show()
 
 # Con Sequential, para practicar
 
-from tensorflow.keras.utils import plot_model
+# from tensorflow.keras.utils import plot_model
 
-plot_model(model, show_shapes=True, to_file="model.png")
+# plot_model(model, show_shapes=True, to_file="model.png")
