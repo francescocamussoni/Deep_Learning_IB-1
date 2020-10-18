@@ -122,3 +122,14 @@ plt.tight_layout()
 # plt.axis("equal")
 plt.savefig("Figuras/2_Acc_Softmax.png", format="png", bbox_inches="tight")
 plt.show()
+
+# model.compile(optimizer=keras.optimizers.Adam(lr),
+#               loss=losses.mean_squared_error,
+#               metrics=[
+#                   metrics.Accuracy(name="a"),
+#                   metrics.CategoricalAccuracy(name="b"),
+#                   metrics.BinaryAccuracy(name="c"),
+#                   "accuracy",
+#                   "categorical_accuracy",
+#                   "binary_accuracy"
+#               ])
