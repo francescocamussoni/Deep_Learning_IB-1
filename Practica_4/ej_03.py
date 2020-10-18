@@ -87,57 +87,49 @@ model.compile(optimizer=optimizers.SGD(learning_rate=lr),
 model.summary()
 
 # Entreno
-history = model.fit(x_train_v,
-                    y_train,
-                    validation_data=(x_test_v, y_test),
-                    epochs=epochs,
-                    batch_size=batch_size,
-                    verbose=2)
+hist = model.fit(x_train_v,
+                 y_train,
+                 validation_data=(x_val_v, y_val),
+                 epochs=epochs,
+                 batch_size=batch_size,
+                 verbose=2)
+
+# Calculo la loss y Accuracy para los datos de test
+test_loss, test_Acc = model.evaluate(x_test, y_test)
 
 # Guardo los datos
-data_folder = os.path.join('Datos', '3')
+data_folder = os.path.join('Datos', '3_Regularizadores')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
-model.save(
-    os.path.join(
-        data_folder,
-        'Regul_lr={}_rf={}_e={}_bs={}.h5'.format(lr, rf, epochs, batch_size)))
-np.save(
-    os.path.join(
-        data_folder,
-        'Regul_lr={}_rf={}_e={}_bs={}.npy'.format(lr, rf, epochs, batch_size)),
-    history.history)
+model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 # Guardo las imagenes
-img_folder = os.path.join('Figuras', '3')
+img_folder = os.path.join('Figuras', '3_Regularizadores')
 if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
 # Grafico
-plt.plot(history.history['loss'], label="Loss")
-plt.plot(history.history['val_loss'], label="Loss Test")
+plt.plot(hist.history['loss'], label="Loss Training")
+plt.plot(hist.history['val_loss'], label="Loss Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(
-    img_folder,
-    'Loss_Regul_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs,
-                                                   batch_size)),
+plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
             format="png",
             bbox_inches="tight")
 plt.close()
 
-plt.plot(history.history['B_Acc'], label="Acc. Training")
-plt.plot(history.history['val_B_Acc'], label="Acc. Test")
+plt.plot(hist.history['B_Acc'], label="Acc. Training")
+plt.plot(hist.history['val_B_Acc'], label="Acc. Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(
-    img_folder,
-    'B_Acc_Regul_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs,
-                                                    batch_size)),
+plt.savefig(os.path.join(img_folder, 'Acc_{}.png'.format(description)),
             format="png",
             bbox_inches="tight")
 plt.close()
