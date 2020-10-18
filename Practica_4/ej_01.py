@@ -81,7 +81,7 @@ plt.tight_layout()
 plt.savefig(os.path.join(img_folder, '1.png'),
             format="png",
             bbox_inches="tight")
-plt.show()
+plt.close()
 
 plt.plot(history.history['loss'], label="Loss Training")
 plt.plot(history.history['val_loss'], label="Loss Test")
@@ -92,7 +92,7 @@ plt.tight_layout()
 plt.savefig(os.path.join(img_folder, '1_Loss.png'),
             format="png",
             bbox_inches="tight")
-plt.show()
+plt.close()
 
 plt.plot(history.history['mse'], label="Acc. Training")
 plt.plot(history.history['val_mse'], label="Acc. Test")
@@ -103,4 +103,4 @@ plt.tight_layout()
 plt.savefig(os.path.join(img_folder, '1_Acc.png'),
             format="png",
             bbox_inches="tight")
-plt.show()
+plt.close()
