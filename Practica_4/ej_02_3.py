@@ -40,7 +40,7 @@ x_train = x_train.reshape(len(x_train), x_train[0].size).astype(np.float)
 x_test = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)
 x_val = x_val.reshape(len(x_val), x_val[0].size).astype(np.float)
 
-# Paso los labels a una matriz binaria
+# Paso los labels a one-hot representation
 y_train = keras.utils.to_categorical(y_train, 10)
 y_test = keras.utils.to_categorical(y_test, 10)
 y_val = keras.utils.to_categorical(y_val, 10)
