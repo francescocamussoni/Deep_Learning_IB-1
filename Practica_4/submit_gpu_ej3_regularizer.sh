@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -N 3_Regu
+#$ -N o_3_Regu
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
