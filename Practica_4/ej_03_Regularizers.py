@@ -15,7 +15,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
-from CLArg import lr, rf, epochs, batch_size, nn, description
+from CLArg import lr, rf, do, epochs, batch_size, nn, description
 
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.datasets import imdb
@@ -80,7 +80,7 @@ model = keras.models.Model(inputs=inputs,
                            outputs=outputs,
                            name="Ejercicio_3_Regularizadores")
 
-model.compile(optimizer=optimizers.SGD(learning_rate=lr),
+model.compile(optimizer=optimizers.Adam(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
               metrics=[metrics.BinaryAccuracy(name='B_Acc')])
 
