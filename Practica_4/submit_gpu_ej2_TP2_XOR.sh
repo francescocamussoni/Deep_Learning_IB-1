@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -N output_2_TP2_EJ4
+#$ -N output_2_TP2_XOR
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
