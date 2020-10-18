@@ -1,11 +1,11 @@
 #! /bin/bash
-#$ -N output_3
+#$ -N o_3_BN
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
 #$ -V
 ##  pido la cola gpu.q
-#$ -q gpu@compute-6-7.local
+#$ -q gpu
 ## pido una placa
 #$ -l gpu=1
 #$ -l memoria_a_usar=1G
