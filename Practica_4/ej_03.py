@@ -10,64 +10,34 @@ GitLab: https://gitlab.com/cabre94
 Description:
 """
 
-import argparse
 import os
 import numpy as np
 from matplotlib import pyplot as plt
 
+# Script propio para pasar argumentos por linea de comandos
+from CLArg import lr, rf, epochs, batch_size, description
+
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.datasets import imdb
+
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras.datasets import imdb
-from tensorflow.keras import (
-    layers,
-    activations,
-    regularizers,
-    losses,
-    metrics,
-    optimizers,
-)
-
-# Argumentos por linea de comandos
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-lr",
-    "--learning_rate",
-    type=float,
-    default=1e-3,
-    help="Learning rate (default: 1e-3)",
-)
-parser.add_argument(
-    "-rf",
-    "--regularizer_factor",
-    type=float,
-    default=0,
-    help="Regularizer factor (default: 0)",
-)
-parser.add_argument(
-    "-e",
-    "--epochs",
-    type=int,
-    default=200,
-    help="Epochs (default: 200)",
-)
-parser.add_argument(
-    "-bs",
-    "--batch_size",
-    type=int,
-    default=None,
-    help="Batch size (default: None)",
-)
-kwargs = vars(parser.parse_args())
-lr = kwargs["learning_rate"]
-rf = kwargs["regularizer_factor"]
-epochs = kwargs['epochs']
-batch_size = kwargs['batch_size']
-
-print('lr: {} rf: {} epochs: {} bs: {}'.format(lr, rf, epochs, batch_size))
+from tensorflow.keras import layers, activations, regularizers
+from tensorflow.keras import losses, metrics, optimizers
 
 # importo los datos
 dim = 10000
 (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=dim)
+
+# Muchos datos de test, prefiero dividirlo en proporciones distintas
+x, y = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
+# Separo los datos de test
+x, x_test, y, y_test = train_test_split(x, y, test_size=0.2, stratify=y)
+# Ahora separa entre training y validacion
+x_train, x_val, y_train, y_val = train_test_split(x,
+                                                  y,
+                                                  test_size=0.25,
+                                                  stratify=y)
 
 indexes = imdb.get_word_index()
 r_indexes = dict([(val, key) for key, val in indexes.items()])
