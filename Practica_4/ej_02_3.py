@@ -15,21 +15,16 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
-from CLArg import lr, rf, epochs, batch_size
+from CLArg import lr, rf, epochs, batch_size, description
 
 from tensorflow.keras.datasets import cifar10
 from sklearn.model_selection import train_test_split
 
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import (
-    layers,
-    activations,
-    regularizers,
-    losses,
-    metrics,
-    optimizers,
-)
+from tensorflow.keras import layers, activations, regularizers
+from tensorflow.keras import losses, metrics, optimizers
+from tensorflow.keras.utils import multi_gpu_model
 
 # Cargo los datos
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()
@@ -82,14 +77,58 @@ model.compile(optimizer=keras.optimizers.Adam(lr),
               loss=losses.mean_squared_error,
               metrics=[metrics.CategoricalAccuracy(name="Acc")])
 
+# Creo que hay que usar otra cosa, pero el cluster no esta actualizado
+try:
+    model = multi_gpu_model(model, gpus=2)
+except:
+    print("No hay GPUs")
+
 model.summary()
 
-history = model.fit(
-    x_train,
-    y_train,
-    epochs=epochs,
-    validation_data=(x_val, y_val),
-    batch_size=batch_size,
-    verbose=2)
+history = model.fit(x_train,
+                    y_train,
+                    epochs=epochs,
+                    validation_data=(x_val, y_val),
+                    batch_size=batch_size,
+                    verbose=2)
 
+# Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+# Guardo los datos
+data_folder = os.path.join('Datos', '2_EJ3_TP2')
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+np.save(os.path.join(data_folder, '{}.npy'.format(description)),
+        history.history)
+
+# Grafico y guardo figuras
+img_folder = os.path.join('Figuras', '2_EJ3_TP2')
+if not os.path.exists(img_folder):
+    os.makedirs(img_folder)
+
+# Grafico
+plt.plot(history.history['loss'], label="Loss Training")
+plt.plot(history.history['val_loss'], label="Loss Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
+plt.xlabel("Epocas", fontsize=15)
+plt.ylabel("Loss", fontsize=15)
+plt.legend(loc='best')
+plt.tight_layout()
+plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
+            format="png",
+            bbox_inches="tight")
+plt.close()
+
+plt.plot(history.history['Acc'], label="Acc. Training")
+plt.plot(history.history['val_Acc'], label="Acc. Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
+plt.xlabel("Epocas", fontsize=15)
+plt.ylabel("Accuracy", fontsize=15)
+plt.legend(loc='best')
+plt.tight_layout()
+plt.savefig(os.path.join(img_folder, 'Acc_{}.png'.format(description)),
+            format="png",
+            bbox_inches="tight")
+plt.close()
