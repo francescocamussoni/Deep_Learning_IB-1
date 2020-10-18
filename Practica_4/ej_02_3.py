@@ -15,7 +15,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
-from CLArg import lr  
+from CLArg import lr, rf, epochs, batch_size
 
 from tensorflow.keras.datasets import cifar10
 
@@ -50,3 +50,35 @@ x_train /= sigma
 x_test = x_test - media
 x_test /= sigma
 
+# Arquitectura de la red segun el ej3 TP2
+inputs = keras.layers.Input(shape=x_train.shape[1] , name="Input")
+
+l1 = keras.layers.Dense(
+    100,
+    name='Hidden',
+    activation=keras.activations.sigmoid,
+    kernel_regularizer=keras.regularizers.l2(rf),
+)(inputs)
+
+output = layers.Dense(10,
+                      name='Output',
+                      activation=activations.linear,
+                      kernel_regularizer=regularizers.l2(rf))(l1)
+
+model = keras.models.Model(inputs=inputs, outputs=output, name='Ej3_TP2')
+
+model.compile(optimizer=keras.optimizers.Adam(lr),
+              loss=losses.mean_squared_error,
+              metrics=[metrics.CategoricalAccuracy(name="Acc")])
+
+model.summary()
+
+history = model.fit(
+    x_train,
+    y_train,
+    epochs=epochs,
+    # validation_data=(x_test, y_test),  # XXX
+    batch_size=batch_size,
+    verbose=2)
+
+y_pred = model.predict(x_test)
