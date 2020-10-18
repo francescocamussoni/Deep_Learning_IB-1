@@ -18,6 +18,7 @@ from matplotlib import pyplot as plt
 from CLArg import lr, rf, epochs, batch_size
 
 from tensorflow.keras.datasets import cifar10
+from sklearn.model_selection import train_test_split
 
 import tensorflow as tf
 from tensorflow import keras
@@ -33,13 +34,21 @@ from tensorflow.keras import (
 # Cargo los datos
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()
 
+# separo el training en train y validation manteniendo la distribucion (y mezclando)
+x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                  y_train,
+                                                  test_size=0.2,
+                                                  stratify=y_train)
+
 # Hago el flatten de los datos
 x_train = x_train.reshape(len(x_train), x_train[0].size).astype(np.float)
 x_test = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)
+x_val = x_val.reshape(len(x_val), x_val[0].size).astype(np.float)
 
 # Paso los labels a una matriz binaria
 y_train = keras.utils.to_categorical(y_train, 10)
 y_test = keras.utils.to_categorical(y_test, 10)
+y_val = keras.utils.to_categorical(y_val, 10)
 
 # Normalizacion
 media = x_train.mean(axis=0)
@@ -49,9 +58,11 @@ x_train = x_train - media
 x_train /= sigma
 x_test = x_test - media
 x_test /= sigma
+x_val = x_val - media
+x_val /= sigma
 
 # Arquitectura de la red segun el ej3 TP2
-inputs = keras.layers.Input(shape=x_train.shape[1] , name="Input")
+inputs = keras.layers.Input(shape=x_train.shape[1], name="Input")
 
 l1 = keras.layers.Dense(
     100,
@@ -77,8 +88,8 @@ history = model.fit(
     x_train,
     y_train,
     epochs=epochs,
-    # validation_data=(x_test, y_test),  # XXX
+    validation_data=(x_val, y_val),
     batch_size=batch_size,
     verbose=2)
 
-y_pred = model.predict(x_test)
+test_loss, test_Acc = model.evaluate(x_test, y_test)
