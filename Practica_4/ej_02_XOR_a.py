@@ -30,15 +30,9 @@ y_train = np.array([[1], [-1], [-1], [1]])
 # Arquitectura de la red
 inputs = layers.Input(shape=(x_train.shape[1], ), name="Input")
 
-layer_1 = layers.Dense(2,
-                       name='Hidden_1',
-                       activation=activations.tanh,
-                       use_bias=True)(inputs)
+layer_1 = layers.Dense(2, name='Hidden_1', activation=activations.tanh)(inputs)
 
-outputs = layers.Dense(1,
-                       name='Output',
-                       activation=activations.tanh,
-                       use_bias=True)(layer_1)
+outputs = layers.Dense(1, name='Output', activation=activations.tanh)(layer_1)
 
 model = keras.models.Model(inputs=inputs,
                            outputs=outputs,
