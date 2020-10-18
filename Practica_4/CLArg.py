@@ -64,6 +64,8 @@ batch_size = kwargs['batch_size']
 drop_arg = kwargs['Dropout']
 nn = kwargs['NumNeuronas']
 
+description = 'lr={}_rf={}_do={}_epochs={}_bs={}_nn={}'.format(
+    lr, rf, drop_arg, epochs, batch_size, nn)
 print("-------------------------------------")
 print('lr: {} rf: {} do: {} epochs: {} bs: {} nn: {}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn))
