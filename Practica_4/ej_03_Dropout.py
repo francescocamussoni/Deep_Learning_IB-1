@@ -10,92 +10,41 @@ GitLab: https://gitlab.com/cabre94
 Description:
 """
 
-import argparse
 import os
 import numpy as np
 from matplotlib import pyplot as plt
 
+# Script propio para pasar argumentos por linea de comandos
+from CLArg import lr, rf, drop_arg, epochs, batch_size, nn, description
+
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.datasets import imdb
+
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras.datasets import imdb
-from tensorflow.keras import (
-    layers,
-    activations,
-    regularizers,
-    losses,
-    metrics,
-    optimizers,
-)
-
-# Argumentos por linea de comandos
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-lr",
-    "--learning_rate",
-    type=float,
-    default=1e-3,
-    help="Learning rate (default: 1e-3)",
-)
-parser.add_argument(
-    "-rf",
-    "--regularizer_factor",
-    type=float,
-    default=0,
-    help="Regularizer factor (default: 0)",
-)
-parser.add_argument(
-    "-e",
-    "--epochs",
-    type=int,
-    default=200,
-    help="Epochs (default: 200)",
-)
-parser.add_argument(
-    "-bs",
-    "--batch_size",
-    type=int,
-    default=None,
-    help="Batch size (default: None)",
-)
-parser.add_argument(
-    "-do",
-    "--Dropout",
-    type=float,
-    default=1,
-    help="Dropout argument (default: 0)",
-)
-kwargs = vars(parser.parse_args())
-lr = kwargs["learning_rate"]
-rf = kwargs["regularizer_factor"]
-epochs = kwargs['epochs']
-batch_size = kwargs['batch_size']
-drop_arg = kwargs['Dropout']
-
-print('lr: {} rf: {} do: {} epochs: {} bs: {}'.format(lr, rf, drop_arg, epochs,
-                                                      batch_size))
+from tensorflow.keras import layers, activations, regularizers
+from tensorflow.keras import losses, metrics, optimizers
 
 # importo los datos
 dim = 10000
 (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=dim)
 
+# Muchos datos de test, prefiero dividirlo en proporciones distintas
+x, y = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
+# Separo los datos de test
+x, x_test, y, y_test = train_test_split(x, y, test_size=0.2, stratify=y)
+# Ahora separa entre training y validacion
+x_train, x_val, y_train, y_val = train_test_split(x,
+                                                  y,
+                                                  test_size=0.25,
+                                                  stratify=y)
+
+# Esto no hace falta, era para pasar a texto la reseña
 indexes = imdb.get_word_index()
 r_indexes = dict([(val, key) for key, val in indexes.items()])
 
-# def vectorize(x, dim):
-#     res = np.zeros((len(x), dim))
-#     for i, sequence in enumerate(x):
-#         values, counts = np.unique(sequence, return_counts=True)
-#         res[i, values] = 1
-#     return res
 
-
-def vectorize(x, dim):
-    res = np.zeros((len(x), dim))
-    for i, sequence in enumerate(x):
-        res[i, sequence] = 1
-    return res
-
-
+# Funcion que Vectoriza datos teniendo en cuenta repeticiones
 def vectorizeWCounts(x, dim):
     res = np.zeros((len(x), dim))
     for i, sequence in enumerate(x):
@@ -104,50 +53,39 @@ def vectorizeWCounts(x, dim):
     return res
 
 
+# Vectorizo los datos
 x_train_v = vectorizeWCounts(x_train, dim)
 x_test_v = vectorizeWCounts(x_test, dim)
+x_val_v = vectorizeWCounts(x_val, dim)
 y_train = y_train.astype(np.float)
 y_test = y_test.astype(np.float)
-# x_v2 = vectorize(x_train, dim)
+y_val = y_val.astype(np.float)
 
-# Arquitectura con regularizadores
+# Arquitectura con dropout
 inputs = layers.Input(shape=(x_train_v.shape[1], ), name="Input")
 
-layer_1 = layers.Dense(
-    25,
-    activation=activations.relu,
-    use_bias=True,
-    #    kernel_regularizer=regularizers.l2(rf),
-    name="Hidden_1")(inputs)
+l1 = layers.Dense(nn, activation=activations.relu, name="Hidden_1")(inputs)
 
-drop_1 = layers.Dropout(drop_arg)(layer_1)
+drop_1 = layers.Dropout(drop_arg)(l1)
 
-layer_2 = layers.Dense(
-    25,
-    activation=activations.relu,
-    use_bias=True,
-    #    kernel_regularizer=regularizers.l2(rf),
-    name="Hidden_2")(drop_1)
+l2 = layers.Dense(nn, activation=activations.relu, name="Hidden_2")(drop_1)
 
-drop_2 = layers.Dropout(drop_arg)(layer_2)
+drop_2 = layers.Dropout(drop_arg)(l2)
 
-outputs = layers.Dense(1,
-                       activation=activations.linear,
-                       use_bias=True,
-                       name="Output")(drop_2)
+outputs = layers.Dense(1, activation=activations.linear, name="Output")(drop_2)
 
 model = keras.models.Model(inputs=inputs,
                            outputs=outputs,
                            name="Ejercicio_3_Dropout")
 
-model.compile(optimizer=optimizers.SGD(learning_rate=lr),
+model.compile(optimizer=optimizers.Adam(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
               metrics=[metrics.BinaryAccuracy(name='B_Acc')])
 
 model.summary()
 
 # Entreno
-history = model.fit(x_train_v,
+hist = model.fit(x_train_v,
                     y_train,
                     validation_data=(x_test_v, y_test),
                     epochs=epochs,
@@ -165,7 +103,7 @@ model.save(
 np.save(
     os.path.join(
         data_folder, 'Dropout_lr={}_rf={}_do={}_e={}_bs={}.npy'.format(
-            lr, rf, drop_arg, epochs, batch_size)), history.history)
+            lr, rf, drop_arg, epochs, batch_size)), hist.history)
 
 # Guardo las imagenes
 img_folder = os.path.join('Figuras', '3_Dropout')
@@ -173,8 +111,8 @@ if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
 # Grafico
-plt.plot(history.history['loss'], label="Loss")
-plt.plot(history.history['val_loss'], label="Loss Test")
+plt.plot(hist.history['loss'], label="Loss")
+plt.plot(hist.history['val_loss'], label="Loss Test")
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
@@ -186,8 +124,8 @@ plt.savefig(os.path.join(
             bbox_inches="tight")
 plt.close()
 
-# plt.plot(history.history['Acc'], label="Acc. Training")
-# plt.plot(history.history['val_Acc'], label="Acc. Test")
+# plt.plot(hist.history['Acc'], label="Acc. Training")
+# plt.plot(hist.history['val_Acc'], label="Acc. Test")
 # plt.xlabel("Epocas", fontsize=15)
 # plt.ylabel("Accuracy", fontsize=15)
 # plt.legend(loc='best')
@@ -199,8 +137,8 @@ plt.close()
 #             bbox_inches="tight")
 # plt.close()
 
-plt.plot(history.history['B_Acc'], label="Acc. Training")
-plt.plot(history.history['val_B_Acc'], label="Acc. Test")
+plt.plot(hist.history['B_Acc'], label="Acc. Training")
+plt.plot(hist.history['val_B_Acc'], label="Acc. Test")
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
 plt.legend(loc='best')
