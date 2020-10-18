@@ -15,7 +15,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
-from CLArg import lr, rf, epochs, batch_size, description
+from CLArg import lr, rf, epochs, batch_size, nn, description
 
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.datasets import imdb
@@ -64,12 +64,12 @@ y_val = y_val.astype(np.float)
 # Arquitectura con regularizadores
 inputs = layers.Input(shape=(x_train_v.shape[1], ), name="Input")
 
-l1 = layers.Dense(25,
+l1 = layers.Dense(nn,
                   activation=activations.relu,
                   kernel_regularizer=regularizers.l2(rf),
                   name="Hidden_1")(inputs)
 
-l2 = layers.Dense(25,
+l2 = layers.Dense(nn,
                   activation=activations.relu,
                   kernel_regularizer=regularizers.l2(rf),
                   name="Hidden_2")(l1)
@@ -95,7 +95,7 @@ hist = model.fit(x_train_v,
                  verbose=2)
 
 # Calculo la loss y Accuracy para los datos de test
-test_loss, test_Acc = model.evaluate(x_test, y_test)
+test_loss, test_Acc = model.evaluate(x_test_v, y_test)
 
 # Guardo los datos
 data_folder = os.path.join('Datos', '3_Regularizadores')
