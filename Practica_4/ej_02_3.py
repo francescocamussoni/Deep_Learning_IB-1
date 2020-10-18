@@ -85,12 +85,12 @@ except:
 
 model.summary()
 
-history = model.fit(x_train,
-                    y_train,
-                    epochs=epochs,
-                    validation_data=(x_val, y_val),
-                    batch_size=batch_size,
-                    verbose=2)
+hist = model.fit(x_train,
+                 y_train,
+                 epochs=epochs,
+                 validation_data=(x_val, y_val),
+                 batch_size=batch_size,
+                 verbose=2)
 
 # Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc = model.evaluate(x_test, y_test)
@@ -100,8 +100,7 @@ data_folder = os.path.join('Datos', '2_EJ3_TP2')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 model.save(os.path.join(data_folder, '{}.h5'.format(description)))
-np.save(os.path.join(data_folder, '{}.npy'.format(description)),
-        history.history)
+np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 # Grafico y guardo figuras
 img_folder = os.path.join('Figuras', '2_EJ3_TP2')
@@ -109,8 +108,8 @@ if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
 # Grafico
-plt.plot(history.history['loss'], label="Loss Training")
-plt.plot(history.history['val_loss'], label="Loss Validation")
+plt.plot(hist.history['loss'], label="Loss Training")
+plt.plot(hist.history['val_loss'], label="Loss Validation")
 plt.title("Acc Test: {:.3f}".format(test_Acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Loss", fontsize=15)
@@ -121,8 +120,8 @@ plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
             bbox_inches="tight")
 plt.close()
 
-plt.plot(history.history['Acc'], label="Acc. Training")
-plt.plot(history.history['val_Acc'], label="Acc. Validation")
+plt.plot(hist.history['Acc'], label="Acc. Training")
+plt.plot(hist.history['val_Acc'], label="Acc. Validation")
 plt.title("Acc Test: {:.3f}".format(test_Acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
