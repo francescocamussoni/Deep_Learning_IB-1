@@ -39,24 +39,12 @@ x_train, x_val, y_train, y_val = train_test_split(x,
                                                   test_size=0.25,
                                                   stratify=y)
 
+# Esto no hace falta, era para pasar a texto la reseña
 indexes = imdb.get_word_index()
 r_indexes = dict([(val, key) for key, val in indexes.items()])
 
-# def vectorize(x, dim):
-#     res = np.zeros((len(x), dim))
-#     for i, sequence in enumerate(x):
-#         values, counts = np.unique(sequence, return_counts=True)
-#         res[i, values] = 1
-#     return res
 
-
-def vectorize(x, dim):
-    res = np.zeros((len(x), dim))
-    for i, sequence in enumerate(x):
-        res[i, sequence] = 1
-    return res
-
-
+# Funcion que Vectoriza datos teniendo en cuenta repeticiones
 def vectorizeWCounts(x, dim):
     res = np.zeros((len(x), dim))
     for i, sequence in enumerate(x):
@@ -65,31 +53,28 @@ def vectorizeWCounts(x, dim):
     return res
 
 
+# Vectorizo los datos
 x_train_v = vectorizeWCounts(x_train, dim)
 x_test_v = vectorizeWCounts(x_test, dim)
+x_val_v = vectorizeWCounts(x_val, dim)
 y_train = y_train.astype(np.float)
 y_test = y_test.astype(np.float)
-# x_v2 = vectorize(x_train, dim)
+y_val = y_val.astype(np.float)
 
 # Arquitectura con regularizadores
 inputs = layers.Input(shape=(x_train_v.shape[1], ), name="Input")
 
-layer_1 = layers.Dense(25,
-                       activation=activations.relu,
-                       use_bias=True,
-                       kernel_regularizer=regularizers.l2(rf),
-                       name="Hidden_1")(inputs)
+l1 = layers.Dense(25,
+                  activation=activations.relu,
+                  kernel_regularizer=regularizers.l2(rf),
+                  name="Hidden_1")(inputs)
 
-layer_2 = layers.Dense(25,
-                       activation=activations.relu,
-                       use_bias=True,
-                       kernel_regularizer=regularizers.l2(rf),
-                       name="Hidden_2")(layer_1)
+l2 = layers.Dense(25,
+                  activation=activations.relu,
+                  kernel_regularizer=regularizers.l2(rf),
+                  name="Hidden_2")(l1)
 
-outputs = layers.Dense(1,
-                       activation=activations.linear,
-                       use_bias=True,
-                       name="Output")(layer_2)
+outputs = layers.Dense(1, activation=activations.linear, name="Output")(l1)
 
 model = keras.models.Model(inputs=inputs,
                            outputs=outputs,
