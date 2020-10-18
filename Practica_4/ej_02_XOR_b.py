@@ -21,7 +21,6 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, activations, regularizers
 from tensorflow.keras import losses, metrics, optimizers
-from tensorflow.keras.utils import multi_gpu_model
 
 # Datos que no son datos
 x_train = np.array([[-1, -1], [-1, 1], [1, -1], [1, 1]])
@@ -51,12 +50,6 @@ def my_acc(y_true, y_pred):
 model.compile(optimizer=keras.optimizers.Adam(lr),
               loss=losses.MSE,
               metrics=[my_acc])
-
-# Creo que hay que usar otra cosa, pero el cluster no esta actualizado
-try:
-    model = multi_gpu_model(model, gpus=2)
-except:
-    print("No hay GPUs")
 
 model.summary()
 

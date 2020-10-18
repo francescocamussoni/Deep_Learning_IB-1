@@ -24,7 +24,6 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, activations, regularizers
 from tensorflow.keras import losses, metrics, optimizers
-from tensorflow.keras.utils import multi_gpu_model
 
 # Cargo los datos
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()
@@ -76,12 +75,6 @@ model = keras.models.Model(inputs=inputs, outputs=output, name='Ej4_TP2')
 model.compile(optimizer=keras.optimizers.Adam(lr),
               loss=losses.CategoricalCrossentropy(from_logits=True),
               metrics=[metrics.CategoricalAccuracy(name="Acc")])
-
-# Creo que hay que usar otra cosa, pero el cluster no esta actualizado
-try:
-    model = multi_gpu_model(model, gpus=2)
-except:
-    print("No hay GPUs")
 
 model.summary()
 

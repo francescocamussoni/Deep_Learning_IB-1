@@ -1,11 +1,11 @@
 #! /bin/bash
-#$ -N output_2_TP2_XOR
+#$ -N o_2_TP2_XOR
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
 #$ -V
 ##  pido la cola gpu.q
-#$ -q gpu
+#$ -q gpu@compute-6-3.local
 ## pido una placa
 #$ -l gpu=1
 #$ -l memoria_a_usar=1G
