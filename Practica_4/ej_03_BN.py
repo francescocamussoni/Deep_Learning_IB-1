@@ -33,7 +33,7 @@ dim = 10000
 x, y = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
 # Separo los datos de test
 x, x_test, y, y_test = train_test_split(x, y, test_size=0.2, stratify=y)
-# Ahora separa entre training y validacion
+# Ahora separo entre training y validacion
 x_train, x_val, y_train, y_val = train_test_split(x,
                                                   y,
                                                   test_size=0.25,
@@ -121,7 +121,7 @@ plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
 plt.close()
 
 plt.plot(hist.history['B_Acc'], label="Acc. Training")
-plt.plot(hist.history['val_B_Acc'], label="Acc. Test")
+plt.plot(hist.history['val_B_Acc'], label="Acc. Validation")
 plt.title("Acc Test: {:.3f}".format(test_Acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)

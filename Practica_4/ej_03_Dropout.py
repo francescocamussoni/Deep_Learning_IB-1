@@ -121,7 +121,7 @@ plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
 plt.close()
 
 plt.plot(hist.history['B_Acc'], label="Acc. Training")
-plt.plot(hist.history['val_B_Acc'], label="Acc. Test")
+plt.plot(hist.history['val_B_Acc'], label="Acc. Validation")
 plt.title("Acc Test: {:.3f}".format(test_Acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)

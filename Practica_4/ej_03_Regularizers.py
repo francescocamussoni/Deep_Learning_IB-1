@@ -15,7 +15,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
-from CLArg import lr, rf, do, epochs, batch_size, nn, description
+from CLArg import lr, rf, drop_arg, epochs, batch_size, nn, description
 
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.datasets import imdb
