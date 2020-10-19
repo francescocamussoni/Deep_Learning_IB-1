@@ -56,6 +56,13 @@ parser.add_argument(
     default=10,
     help="Numero de neuronas (default: 10)",
 )
+parser.add_argument(
+    "-ed",
+    "--EmbeddingDim",
+    type=int,
+    default=100,
+    help="Dimension de salida del embedding (default: 100)",
+)
 kwargs = vars(parser.parse_args())
 lr = kwargs["learning_rate"]
 rf = kwargs["regularizer_factor"]
@@ -63,9 +70,10 @@ epochs = kwargs['epochs']
 batch_size = kwargs['batch_size']
 drop_arg = kwargs['Dropout']
 nn = kwargs['NumNeuronas']
+embedding_dim = kwargs['EmbeddingDim']
 
-description = 'lr={}_rf={}_do={}_epochs={}_bs={}_nn={}'.format(
-    lr, rf, drop_arg, epochs, batch_size, nn)
+description = 'lr={}_rf={}_do={}_epochs={}_bs={}_nn={}_ed={}'.format(
+    lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim)
 print("-------------------------------------")
 print('lr: {} rf: {} do: {} epochs: {} bs: {} nn: {}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn))
