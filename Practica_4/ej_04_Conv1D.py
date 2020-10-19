@@ -83,7 +83,7 @@ hist = model.fit(x_train,
                  validation_data=(x_val, y_val),
                  epochs=epochs,
                  batch_size=batch_size,
-                 verbose=1)
+                 verbose=2)
 
 # Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc = model.evaluate(x_test, y_test)
