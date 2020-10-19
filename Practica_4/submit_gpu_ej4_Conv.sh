@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -N o_4_Embe
+#$ -N o_4_Conv
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
