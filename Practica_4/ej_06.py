@@ -175,8 +175,8 @@ for train_index, test_index in kf.split(idx):
 
 acc_test = acc_test.reshape((5, epochs))
 acc_train = acc_train.reshape((5, epochs))
-loss_test = acc_train.reshape((5, epochs))
-loss_train = acc_train.reshape((5, epochs))
+loss_test = loss_test.reshape((5, epochs))
+loss_train = loss_train.reshape((5, epochs))
 
 
 def toDictionary(va, a, vl, l):
@@ -200,6 +200,10 @@ def toDictionary(va, a, vl, l):
 
 
 results = toDictionary(acc_test, acc_train, loss_test, loss_train)
+np.save(
+    os.path.join(
+        data_folder, 'lr={}_rf={}_do={}_e={}_bs={}_nn={}.npy'.format(
+            lr, rf, drop_arg, epochs, batch_size, nn)), history.history)
 
 # Guardo las imagenes
 img_folder = os.path.join('Figuras', '6')
@@ -207,7 +211,7 @@ if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
 xx = np.arange(epochs)
-plt.fill_between(xx, results['train_min'], results['train_max'], alpha=0.2)
+plt.fill_between(xx, results['train_min'], results['train_max'], alpha=0.35)
 plt.plot(results['train_mean'], '-')
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
@@ -215,14 +219,15 @@ plt.ylabel("Accuracy", fontsize=15)
 plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
-    'Acc_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs, batch_size)),
+    'Acc_lr={}_rf={}_e={}_bs={}_nn={}.png'.format(lr, rf, epochs, batch_size,
+                                                  nn)),
             format="png",
             bbox_inches="tight")
 # plt.show()
 plt.close()
 
 # Grafico
-plt.fill_between(xx, results['test_min'], results['test_max'], alpha=0.2)
+plt.fill_between(xx, results['test_min'], results['test_max'], alpha=0.35)
 plt.plot(results['test_mean'], '-')
 # plt.plot(history.history['loss'], label="Loss")
 # plt.plot(history.history['val_loss'], label="Loss Test")
@@ -232,15 +237,16 @@ plt.ylabel("Test Accuracy", fontsize=15)
 plt.tight_layout()
 plt.savefig(os.path.join(
     img_folder,
-    'Acc_Test_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs, batch_size)),
+    'Acc_Test_lr={}_rf={}_e={}_bs={}_nn={}.png'.format(lr, rf, epochs,
+                                                       batch_size, nn)),
             format="png",
             bbox_inches="tight")
 # plt.show()
 plt.close()
 
-plt.fill_between(xx, results['ltrain_min'], results['ltrain_max'], alpha=0.2)
+plt.fill_between(xx, results['ltrain_min'], results['ltrain_max'], alpha=0.35)
 plt.plot(results['ltrain_mean'], '-', label="Loss")
-plt.fill_between(xx, results['ltest_min'], results['ltest_max'], alpha=0.2)
+plt.fill_between(xx, results['ltest_min'], results['ltest_max'], alpha=0.35)
 plt.plot(results['ltest_mean'], '-', label="Loss Test")
 # plt.plot(history.history['loss'], label="Loss")
 # plt.plot(history.history['val_loss'], label="Loss Test")
@@ -249,9 +255,8 @@ plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(
-    img_folder,
-    'Loss_Regul_lr={}_rf={}_e={}_bs={}.png'.format(lr, rf, epochs,
-                                                   batch_size)),
+    img_folder, 'Loss_Regul_lr={}_rf={}_e={}_bs={}_nn={}.png'.format(
+        lr, rf, epochs, batch_size, nn)),
             format="png",
             bbox_inches="tight")
 # plt.show()
