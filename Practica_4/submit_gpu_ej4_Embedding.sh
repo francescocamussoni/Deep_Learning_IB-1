@@ -19,33 +19,33 @@ source activate deep_learning
 hostname
 
 #python testkeras.py
-python ej_04_embeddings.py -lr 1e-5 -e 200 -ed 50  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-5 -e 200 -ed 75  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-5 -e 200 -ed 100 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-5 -e 200 -ed 125 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-5 -e 200 -ed 150 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-5 -e 200 -ed 50  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-5 -e 200 -ed 75  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-5 -e 200 -ed 100 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-5 -e 200 -ed 125 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-5 -e 200 -ed 150 -bs 256 -nn 25
 
-python ej_04_embeddings.py -lr 1e-4 -e 200 -ed 50  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-4 -e 200 -ed 75  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-4 -e 200 -ed 100 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-4 -e 200 -ed 125 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-4 -e 200 -ed 150 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-4 -e 200 -ed 50  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-4 -e 200 -ed 75  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-4 -e 200 -ed 100 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-4 -e 200 -ed 125 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-4 -e 200 -ed 150 -bs 256 -nn 25
 
-python ej_04_embeddings.py -lr 1e-3 -e 200 -ed 50  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-3 -e 200 -ed 75  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-3 -e 200 -ed 100 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-3 -e 200 -ed 125 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-3 -e 200 -ed 150 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-3 -e 200 -ed 50  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-3 -e 200 -ed 75  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-3 -e 200 -ed 100 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-3 -e 200 -ed 125 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-3 -e 200 -ed 150 -bs 256 -nn 25
 
-python ej_04_embeddings.py -lr 1e-2 -e 200 -ed 50  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-2 -e 200 -ed 75  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-2 -e 200 -ed 100 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-2 -e 200 -ed 125 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-2 -e 200 -ed 150 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-2 -e 200 -ed 50  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-2 -e 200 -ed 75  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-2 -e 200 -ed 100 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-2 -e 200 -ed 125 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-2 -e 200 -ed 150 -bs 256 -nn 25
 
-python ej_04_embeddings.py -lr 1e-1 -e 200 -ed 50  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-1 -e 200 -ed 75  -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-1 -e 200 -ed 100 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-1 -e 200 -ed 125 -bs 256 -nn 25
-python ej_04_embeddings.py -lr 1e-1 -e 200 -ed 150 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-1 -e 200 -ed 50  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-1 -e 200 -ed 75  -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-1 -e 200 -ed 100 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-1 -e 200 -ed 125 -bs 256 -nn 25
+python ej_04_Embeddings.py -lr 1e-1 -e 200 -ed 150 -bs 256 -nn 25
 
