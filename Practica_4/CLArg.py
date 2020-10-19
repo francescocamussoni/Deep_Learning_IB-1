@@ -46,7 +46,7 @@ parser.add_argument(
     "-do",
     "--Dropout",
     type=float,
-    default=1,
+    default=0,
     help="Dropout argument (default: 0)",
 )
 parser.add_argument(
@@ -74,7 +74,8 @@ embedding_dim = kwargs['EmbeddingDim']
 
 description = 'lr={}_rf={}_do={}_epochs={}_bs={}_nn={}_ed={}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim)
-print("-------------------------------------")
-print('lr: {} rf: {} do: {} epochs: {} bs: {} nn: {}'.format(
-    lr, rf, drop_arg, epochs, batch_size, nn))
-print("-------------------------------------")
+    
+print("\n-------------------------------------")
+print('lr: {} rf: {} do: {} epochs: {} bs: {} nn: {} ed: {}'.format(
+    lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim))
+print("-------------------------------------\n")
