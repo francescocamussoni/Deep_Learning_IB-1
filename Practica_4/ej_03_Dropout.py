@@ -7,7 +7,7 @@ Author : Facundo Martin Cabrera
 Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
 GitLab: https://gitlab.com/cabre94
-Description:
+Description: https://builtin.com/data-science/how-build-neural-network-keras
 """
 
 import os
