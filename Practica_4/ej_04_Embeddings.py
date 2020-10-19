@@ -7,7 +7,7 @@ Author : Facundo Martin Cabrera
 Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
 GitLab: https://gitlab.com/cabre94
-Description:
+Description: https://machinelearningmastery.com/predict-sentiment-movie-reviews-using-deep-learning/
 """
 
 import os
@@ -46,7 +46,7 @@ x_train, x_val, y_train, y_val = train_test_split(x,
 # Arquitectura con dropout
 inputs = layers.Input(shape=x.shape[1], name="Input")
 
-embe = layers.Embedding(dim, 100, input_length=x.shape[1])(inputs)
+embe = layers.Embedding(dim, embedding_dim, input_length=x.shape[1])(inputs)
 
 flatten = layers.Flatten()(embe)
 
