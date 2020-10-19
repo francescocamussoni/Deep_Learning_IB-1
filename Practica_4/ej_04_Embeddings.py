@@ -43,22 +43,16 @@ x_train, x_val, y_train, y_val = train_test_split(x,
                                                   test_size=0.25,
                                                   stratify=y)
 
+
 # Arquitectura con dropout
-inputs = layers.Input(shape=x.shape[1], name="Input")
+model = keras.models.Sequential(name='Ejercicio_4_Embedding')
 
-embe = layers.Embedding(dim, embedding_dim, input_length=x.shape[1])(inputs)
+model.add(layers.Embedding(dim, embedding_dim, input_length=x.shape[1]))
+model.add(layers.Flatten())
 
-flatten = layers.Flatten()(embe)
-
-l1 = layers.Dense(nn, activation=activations.relu, name="Hidden_1")(flatten)
-
-l2 = layers.Dense(nn, activation=activations.relu, name="Hidden_2")(l1)
-
-outputs = layers.Dense(1, activation=activations.linear, name="Output")(l2)
-
-model = keras.models.Model(inputs=inputs,
-                           outputs=outputs,
-                           name="Ejercicio_4_Embedding")
+model.add(layers.Dense(nn, activation=activations.relu, name="Hidden_1"))
+model.add(layers.Dense(nn, activation=activations.relu, name="Hidden_2"))
+model.add(layers.Dense(1, activation=activations.linear, name="Output"))
 
 model.compile(optimizer=optimizers.Adam(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
