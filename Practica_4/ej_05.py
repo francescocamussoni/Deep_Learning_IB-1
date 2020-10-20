@@ -10,90 +10,35 @@ GitLab: https://gitlab.com/cabre94
 Description:
 """
 
-import argparse
 import os
 import numpy as np
 from matplotlib import pyplot as plt
 
+# Script propio para pasar argumentos por linea de comandos
+from CLArg import lr, rf, epochs, drop_arg, batch_size, description
+
+from sklearn.model_selection import train_test_split
+
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras.datasets import imdb
-from tensorflow.keras import (
-    layers,
-    activations,
-    regularizers,
-    losses,
-    metrics,
-    optimizers,
-)
-
-# Argumentos por linea de comandos
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-lr",
-    "--learning_rate",
-    type=float,
-    default=1e-3,
-    help="Learning rate (default: 1e-3)",
-)
-parser.add_argument(
-    "-rf",
-    "--regularizer_factor",
-    type=float,
-    default=0,
-    help="Regularizer factor (default: 0)",
-)
-parser.add_argument(
-    "-e",
-    "--epochs",
-    type=int,
-    default=200,
-    help="Epochs (default: 200)",
-)
-parser.add_argument(
-    "-bs",
-    "--batch_size",
-    type=int,
-    default=None,
-    help="Batch size (default: None)",
-)
-parser.add_argument(
-    "-do",
-    "--Dropout",
-    type=float,
-    default=1,
-    help="Dropout argument (default: 0)",
-)
-kwargs = vars(parser.parse_args())
-lr = kwargs["learning_rate"]
-rf = kwargs["regularizer_factor"]
-epochs = kwargs['epochs']
-batch_size = kwargs['batch_size']
-drop_arg = kwargs['Dropout']
-
-print('lr: {} rf: {} do: {} epochs: {} bs: {}'.format(lr, rf, drop_arg, epochs,
-                                                      batch_size))
+from tensorflow.keras import layers, activations, regularizers
+from tensorflow.keras import losses, metrics, optimizers
 
 # Datos
-nData = 100000
+nData = 1000000
 x = np.linspace(0, 1, nData).reshape((nData, 1))
 y = 4 * x * (1 - x)
 
-idx = np.arange(nData)
-np.random.shuffle(idx)
-
-x_train = x[idx[:-len(idx) // 5]]
-x_test = x[idx[-len(idx) // 5:]]
-
-y_train = x[idx[:-len(idx) // 5]]
-y_test = x[idx[-len(idx) // 5:]]
+# Separo los datos de test
+x, x_test, y, y_test = train_test_split(x, y, test_size=0.1)
+# Ahora separo entre training y validacion
+x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=1 / 9)
 
 # Arquitectura de la red
 inputs = layers.Input(shape=(x_train.shape[1], ), name="Input")
 
 layer_1 = layers.Dense(5,
                        activation=activations.tanh,
-                       use_bias=True,
                        kernel_regularizer=regularizers.l2(rf),
                        name='Hidden')(inputs)
 
@@ -101,7 +46,6 @@ concat = layers.Concatenate()([inputs, layer_1])
 
 outputs = layers.Dense(1,
                        activation=activations.linear,
-                       use_bias=True,
                        kernel_regularizer=regularizers.l2(rf),
                        name='Output')(concat)
 
@@ -114,28 +58,22 @@ model.compile(optimizer=optimizers.SGD(learning_rate=lr),
 model.summary()
 
 # Entreno
-history = model.fit(x_train,
-                    y_train,
-                    validation_data=(x_test, y_test),
-                    epochs=epochs,
-                    batch_size=batch_size,
-                    verbose=2)
+hist = model.fit(x_train,
+                 y_train,
+                 validation_data=(x_val, y_val),
+                 epochs=epochs,
+                 batch_size=batch_size,
+                 verbose=2)
+
+# Calculo la loss y Accuracy para los datos de test
+test_loss, test_Acc = model.evaluate(x_test, y_test)
 
 # Guardo los datos
 data_folder = os.path.join('Datos', '5')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
-model.save(
-    os.path.join(
-        data_folder,
-        'lr={}_rf={}_do={}_e={}_bs={}.h5'.format(lr, rf, drop_arg, epochs,
-                                                 batch_size)))
-np.save(
-    os.path.join(
-        data_folder,
-        'lr={}_rf={}_do={}_e={}_bs={}.npy'.format(lr, rf, drop_arg, epochs,
-                                                  batch_size)),
-    history.history)
+model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 # Guardo las imagenes
 img_folder = os.path.join('Figuras', '5')
@@ -143,29 +81,26 @@ if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
 # Grafico
-plt.plot(history.history['loss'], label="Loss Training")
-plt.plot(history.history['val_loss'], label="Loss Test")
+plt.plot(hist.history['loss'], label="Loss Training")
+plt.plot(hist.history['val_loss'], label="Loss Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(
-    img_folder,
-    'Loss_lr={}_rf={}_do={}_e={}_bs={}.png'.format(lr, rf, drop_arg, epochs,
-                                                   batch_size)),
+plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
             format="png",
             bbox_inches="tight")
 plt.close()
 
-plt.plot(history.history['acc_MSE'], label="Acc. Training")
-plt.plot(history.history['val_acc_MSE'], label="Acc. Test")
+plt.plot(hist.history['acc_MSE'], label="Acc. Training")
+plt.plot(hist.history['val_acc_MSE'], label="Acc. Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(
-    img_folder, 'Acc_Dropout_lr={}_rf={}_do={}_e={}_bs={}.png'.format(
-        lr, rf, drop_arg, epochs, batch_size)),
+plt.savefig(os.path.join(img_folder, 'Acc_{}.png'.format(description)),
             format="png",
             bbox_inches="tight")
 plt.close()
