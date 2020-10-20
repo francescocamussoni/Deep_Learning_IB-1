@@ -260,3 +260,6 @@ Practica_4/output_5.o230441
 Practica_4/output_5.o230436
 Practica_4/output_3.o230440
 Practica_4/output_3.o230438
+Practica_4/o_*.o*
+Practica_4/output_*.o*
+Practica_4/__pycache__/CLArg.cpython-37.pyc
