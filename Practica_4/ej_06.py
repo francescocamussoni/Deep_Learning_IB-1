@@ -10,80 +10,19 @@ GitLab: https://gitlab.com/cabre94
 Description:
 """
 
-import argparse
 import os
 import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.model_selection import KFold
+from sklearn.model_selection import train_test_split
+
+# Script propio para pasar argumentos por linea de comandos
+from CLArg import lr, nn, rf, embedding_dim, epochs, drop_arg, batch_size, description
 
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras.datasets import imdb
-from tensorflow.keras import (
-    layers,
-    activations,
-    regularizers,
-    losses,
-    metrics,
-    optimizers,
-)
-
-# Argumentos por linea de comandos
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-lr",
-    "--learning_rate",
-    type=float,
-    default=1e-3,
-    help="Learning rate (default: 1e-3)",
-)
-parser.add_argument(
-    "-rf",
-    "--regularizer_factor",
-    type=float,
-    default=0,
-    help="Regularizer factor (default: 0)",
-)
-parser.add_argument(
-    "-e",
-    "--epochs",
-    type=int,
-    default=200,
-    help="Epochs (default: 200)",
-)
-parser.add_argument(
-    "-bs",
-    "--batch_size",
-    type=int,
-    default=None,
-    help="Batch size (default: None)",
-)
-parser.add_argument(
-    "-do",
-    "--Dropout",
-    type=float,
-    default=1,
-    help="Dropout argument (default: 0)",
-)
-parser.add_argument(
-    "-nn",
-    "--NumNeuronas",
-    type=int,
-    default=10,
-    help="Numero de neuronas (default: 10)",
-)
-kwargs = vars(parser.parse_args())
-lr = kwargs["learning_rate"]
-rf = kwargs["regularizer_factor"]
-epochs = kwargs['epochs']
-batch_size = kwargs['batch_size']
-drop_arg = kwargs['Dropout']
-nn = kwargs['NumNeuronas']
-
-print("-------------------------------------")
-print('lr: {} rf: {} do: {} epochs: {} bs: {} nn: {}'.format(
-    lr, rf, drop_arg, epochs, batch_size, nn))
-print("-------------------------------------")
+from tensorflow.keras import layers, activations, regularizers
+from tensorflow.keras import losses, metrics, optimizers
 
 # Cargo los datos
 # Probar esto desde el cluster. Edit: Parece que funciona
@@ -91,33 +30,30 @@ path_folder = os.path.join("/", "share", "apps", "DeepLearning", "Datos")
 file = "pima-indians-diabetes.csv"
 path_file = os.path.join(path_folder, file)
 
-# path_file = '/run/user/1000/gvfs/sftp:host=10.73.25.223,user=facundo.cabrera/share/apps/DeepLearning/Datos/pima-indians-diabetes.csv'
+path_file = '/run/user/1000/gvfs/sftp:host=10.73.25.223,user=facundo.cabrera/share/apps/DeepLearning/Datos/pima-indians-diabetes.csv'
 
 data = np.loadtxt(path_file, delimiter=',')
 
 x = data[:, :-1]
 y = data[:, -1].reshape((data.shape[0], 1))
 
-inputs = layers.Input(shape=(x.shape[1], ), name="Input")
+# Arquitectura de la red
+model = keras.models.Sequential(name='Ejercicio_6')
 
-layer_1 = layers.Dense(nn,
-                       activation=activations.relu,
-                       use_bias=True,
-                       kernel_regularizer=regularizers.l2(rf),
-                       name="Hidden_1")(inputs)
+model.add(
+    layers.Dense(nn,
+                 input_shape=(x.shape[1], ),
+                 activation=activations.relu,
+                 kernel_regularizer=regularizers.l2(rf),
+                 name="Hidden_1"))
 
-layer_2 = layers.Dense(nn,
-                       activation=activations.relu,
-                       use_bias=True,
-                       kernel_regularizer=regularizers.l2(rf),
-                       name="Hidden_2")(layer_1)
+model.add(
+    layers.Dense(nn,
+                 activation=activations.relu,
+                 kernel_regularizer=regularizers.l2(rf),
+                 name="Hidden_2"))
 
-outputs = layers.Dense(1,
-                       activation=activations.linear,
-                       use_bias=True,
-                       name="Output")(layer_2)
-
-model = keras.models.Model(inputs=inputs, outputs=outputs, name="Ejercicio_6")
+model.add(layers.Dense(1, activation=activations.linear, name="Output"))
 
 model.compile(optimizer=optimizers.SGD(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
@@ -153,23 +89,18 @@ for train_index, test_index in kf.split(idx):
     model.load_weights(sv)
 
     # Entreno
-    history = model.fit(x_train,
-                        y_train,
-                        validation_data=(x_test, y_test),
-                        epochs=epochs,
-                        batch_size=batch_size,
-                        verbose=2)
+    hist = model.fit(x_train,
+                     y_train,
+                     validation_data=(x_test, y_test),
+                     epochs=epochs,
+                     batch_size=batch_size,
+                     verbose=2)
 
-    acc_test = np.concatenate((acc_test, history.history['val_Acc']))
-    acc_train = np.concatenate((acc_train, history.history['Acc']))
+    acc_test = np.concatenate((acc_test, hist.history['val_Acc']))
+    acc_train = np.concatenate((acc_train, hist.history['Acc']))
 
-    loss_test = np.concatenate((loss_test, history.history['loss']))
-    loss_train = np.concatenate((loss_train, history.history['val_loss']))
-
-    # acc_test = np.vstack( (acc_test, history.history['val_Acc']) )
-
-    # kkparachequear = idx[test_index]
-    # check = np.append(check, kkparachequear)
+    loss_test = np.concatenate((loss_test, hist.history['loss']))
+    loss_train = np.concatenate((loss_train, hist.history['val_loss']))
 
 # os.remove(sv)     # esto me genera problemas. No se bien porque
 
@@ -200,10 +131,7 @@ def toDictionary(va, a, vl, l):
 
 
 results = toDictionary(acc_test, acc_train, loss_test, loss_train)
-np.save(
-    os.path.join(
-        data_folder, 'lr={}_rf={}_do={}_e={}_bs={}_nn={}.npy'.format(
-            lr, rf, drop_arg, epochs, batch_size, nn)), history.history)
+np.save(os.path.join(data_folder, '{}.npy'.format(description)), results)
 
 # Guardo las imagenes
 img_folder = os.path.join('Figuras', '6')
@@ -217,49 +145,33 @@ plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
 # plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(
-    img_folder,
-    'Acc_lr={}_rf={}_e={}_bs={}_nn={}.png'.format(lr, rf, epochs, batch_size,
-                                                  nn)),
+plt.savefig(os.path.join(img_folder, 'Acc_{}.png'.format(description)),
             format="png",
             bbox_inches="tight")
-# plt.show()
 plt.close()
 
 # Grafico
 plt.fill_between(xx, results['test_min'], results['test_max'], alpha=0.35)
 plt.plot(results['test_mean'], '-')
-# plt.plot(history.history['loss'], label="Loss")
-# plt.plot(history.history['val_loss'], label="Loss Test")
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Test Accuracy", fontsize=15)
-# plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(
-    img_folder,
-    'Acc_Test_lr={}_rf={}_e={}_bs={}_nn={}.png'.format(lr, rf, epochs,
-                                                       batch_size, nn)),
+plt.savefig(os.path.join(img_folder, 'Acc_Test_{}.png'.format(description)),
             format="png",
             bbox_inches="tight")
-# plt.show()
 plt.close()
 
 plt.fill_between(xx, results['ltrain_min'], results['ltrain_max'], alpha=0.35)
-plt.plot(results['ltrain_mean'], '-', label="Loss")
+plt.plot(results['ltrain_mean'], '-', label="Loss Training")
 plt.fill_between(xx, results['ltest_min'], results['ltest_max'], alpha=0.35)
 plt.plot(results['ltest_mean'], '-', label="Loss Test")
-# plt.plot(history.history['loss'], label="Loss")
-# plt.plot(history.history['val_loss'], label="Loss Test")
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(
-    img_folder, 'Loss_Regul_lr={}_rf={}_e={}_bs={}_nn={}.png'.format(
-        lr, rf, epochs, batch_size, nn)),
+plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
             format="png",
             bbox_inches="tight")
-# plt.show()
 plt.close()
 
 # check.sort()    # Si todo esta bien esto deberia tener todos los enteros de 0 a x.shape sin repetir
