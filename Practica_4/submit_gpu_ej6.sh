@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -N output_6
+#$ -N o_6
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
