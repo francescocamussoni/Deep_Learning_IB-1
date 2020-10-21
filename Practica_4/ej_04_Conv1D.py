@@ -51,21 +51,34 @@ model.add(layers.Embedding(dim, embedding_dim, input_length=x.shape[1]))
 model.add(layers.Dropout(drop_arg))
 model.add(layers.BatchNormalization())
 
-model.add(layers.Conv1D(filters=32, kernel_size=3, padding='same', activation=activations.relu))
+model.add(
+    layers.Conv1D(
+        filters=32,
+        kernel_size=3,
+        padding='same',
+        activation=activations.relu,
+        kernel_regularizer=regularizers.l2(rf),
+    ))
 model.add(layers.MaxPooling1D())
 
 model.add(layers.Dropout(drop_arg))
 model.add(layers.BatchNormalization())
 
-model.add(layers.Conv1D(filters=64, kernel_size=3, padding='same', activation=activations.relu))
+model.add(
+    layers.Conv1D(
+        filters=64,
+        kernel_size=3,
+        padding='same',
+        activation=activations.relu,
+        kernel_regularizer=regularizers.l2(rf),
+    ))
 model.add(layers.MaxPooling1D())
 model.add(layers.Flatten())
 
 model.add(layers.Dropout(drop_arg))
 model.add(layers.BatchNormalization())
 
-model.add(layers.Dense(1, activation=activations.linear,
-                       name="Output"))
+model.add(layers.Dense(1, activation=activations.linear, name="Output"))
 
 model.compile(optimizer=optimizers.Adam(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
