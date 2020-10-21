@@ -54,6 +54,10 @@ class Pez(object):
 		aux.pos = self.pos + pez.pos
 		aux.vel = self.vel + pez.vel
 		return aux
+	
+	# Agregue esto para que me de el array de posiciones
+	def getpos(self):
+		return self.pos
 
 class Cardumen(object):
 	"""docstring for Cardumen"""
@@ -70,6 +74,14 @@ class Cardumen(object):
 		self.gif = []
 
 		self.fig = plt.figure()
+
+		self.getPosPez = np.vectorize(self.getPosPez)	# Y esto
+	
+	def getPosPez(self, pez):		# Y esto
+		return pez.getpos()
+	
+	def getPos(self):				# Y esto es lo ultimo
+		return self.getPosPez(self.Peces)
 
 	def CMyVM(self):
 		aux = self.Peces.sum()
@@ -180,18 +192,34 @@ class Cardumen(object):
 			print("vel = ({:.2f}, {:.2f})".format(self.Peces[i].vel.r[0], self.Peces[i].vel.r[1]))
 		print("")
 
+#def getpos(pez):
+#	return pez.pos
 
-from matplotlib import animation
-		
+#getPos = np.vectorize(getpos)
+
+#pez1 = Pez(R2(1,2), R2(5,8))
+#pez2 = Pez(R2(5,5), R2(8,9))
+
+#kknegra = np.array([pez1, pez2])
+
 c = Cardumen()
 c.initialize(40, 4, 1)
 
-for i in range(NUM_ITERAC):
-	c.doStep()
-	c.print()
+print(c.getPos())
 
-ani = animation.ArtistAnimation(c.fig, c.gif, interval=50, blit=True, repeat_delay=1000)
+# """
+# from matplotlib import animation
+		
+# c = Cardumen()
+# c.initialize(40, 4, 1)
 
-plt.show()
+# for i in range(NUM_ITERAC):
+# 	c.doStep()
+# 	c.print()
 
-#ani.save("cardumen_1.mp4")
+# ani = animation.ArtistAnimation(c.fig, c.gif, interval=50, blit=True, repeat_delay=1000)
+
+# plt.show()
+
+# #ani.save("cardumen_1.mp4")
+# """
