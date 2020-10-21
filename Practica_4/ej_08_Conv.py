@@ -7,7 +7,7 @@ Author : Facundo Martin Cabrera
 Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
 GitLab: https://gitlab.com/cabre94
-Description: https://tensorchiefs.github.io/dl_course/exercises/07_fcn_MNIST_tricks
+Description:
 """
 
 import os
@@ -43,11 +43,11 @@ x_train, x_val, y_train, y_val = train_test_split(x,
 media = x_train.mean(axis=0)
 
 x_train = x_train - media
-x_train = x_train / 255
+x_train = x_train.reshape((-1, 28, 28, 1)) / 255
 x_test = x_test - media
-x_test = x_test / 255
+x_test = x_test.reshape((-1, 28, 28, 1)) / 255
 x_val = x_val - media
-x_val = x_val / 255
+x_val = x_val.reshape((-1, 28, 28, 1)) / 255
 
 # Paso los labels a one-hot representation
 y_train = keras.utils.to_categorical(y_train, 10)
@@ -55,13 +55,16 @@ y_test = keras.utils.to_categorical(y_test, 10)
 y_val = keras.utils.to_categorical(y_val, 10)
 
 # Arquitectura de la red con capas densas
-model = keras.models.Sequential(name='MNIST_Dense')
+model = keras.models.Sequential(name='MNIST_Conv')
+model.add(layers.Input(shape=x_train.shape[1:]))
 
-model.add(layers.Flatten(input_shape=x_train.shape[1:]))
-model.add(layers.Dense(250, 'relu', kernel_regularizer=l2(rf)))
-model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(32, 3, activation='relu'))
+model.add(layers.MaxPool2D())
+model.add(layers.Conv2D(64, 3, activation='relu'))
 model.add(layers.Dropout(drop_arg))
-model.add(layers.Dense(50, 'relu', kernel_regularizer=l2(rf)))
+model.add(layers.Conv2D(64, 3, activation='relu'))
+model.add(layers.MaxPool2D())
+model.add(layers.Flatten())
 model.add(layers.BatchNormalization())
 model.add(layers.Dropout(drop_arg))
 model.add(layers.Dense(10, 'linear', kernel_regularizer=l2(rf)))
@@ -83,14 +86,14 @@ hist = model.fit(x_train,
 test_loss, test_Acc = model.evaluate(x_test, y_test)
 
 # Guardo los datos
-data_folder = os.path.join('Datos', '8_Dense')
+data_folder = os.path.join('Datos', '8_Conv')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 model.save(os.path.join(data_folder, '{}.h5'.format(description)))
 np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 # Guardo las imagenes
-img_folder = os.path.join('Figuras', '8_Dense')
+img_folder = os.path.join('Figuras', '8_Conv')
 if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
