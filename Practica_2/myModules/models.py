@@ -35,7 +35,7 @@ class Network(object):
         return self.layers[i]
 
     def fit(self,x, y, epochs = 100, bs = 50, loss = losses.MSE(), metric=metrics.acc_XOR,
-                    opt = optimizers.SGD(), x_test=None, y_test=None, plot=True):
+                    opt = optimizers.SGD(), x_test=None, y_test=None, plot=True, print_every=10, ej=0):
 
         self.loss = loss
         self.opt = opt
@@ -66,7 +66,7 @@ class Network(object):
             if(isinstance(x_test, np.ndarray)):
                 t_acc  = np.append(t_acc  , metric(self.forward(x_test), y_test) )
             
-            if (e % 1 == 0):
+            if (e % print_every == 0):
                 if(isinstance(x_test, np.ndarray)):
                     print("{}/{}\tloss: {:.2f}\tAccurracy: {:.2f}\ttest: {:.2f}".format(
                     e, epochs, loss_v[-1], acc[-1], t_acc[-1] ))
@@ -100,22 +100,41 @@ class Network(object):
         if(isinstance(x_test, np.ndarray)):
             print("Precision final con los datos de test: ", t_acc[-1])
         
+        if(plot):
+            plt.close('all')
+        # plt.ion()
 
-        plt.close('all')
-        plt.ion()
-
-        plt.figure()
-        plt.title("Loss")
+        # plt.figure()
         plt.plot(np.arange(epochs), loss_v)
+        plt.xlabel("Epoca",fontsize=15)
+        plt.ylabel("Loss",fontsize=15)
+        if(ej != 0):
+            plt.savefig('Informe/678/Loss_ej_{}.pdf'.format(ej), format='pdf', bbox_inches='tight')
+        # plt.show()
+        plt.close()
 
-        plt.figure()
-        plt.title("Accurracy")
+        # plt.figure()
         plt.plot(np.arange(epochs), acc)
+        plt.ylabel("Accurracy Training",fontsize=15)
+        plt.xlabel("Epoca",fontsize=15)
+        if(ej != 0):
+            plt.savefig('Informe/678/Acc_ej_{}.pdf'.format(ej), format='pdf', bbox_inches='tight')
+        plt.close()
+        # plt.show()
 
         if(isinstance(x_test, np.ndarray)):
-            plt.figure()
-            plt.title("Test Accurracy")
+            # plt.figure()
             plt.plot(np.arange(epochs), t_acc)
+            plt.ylabel("Test Accurracy",fontsize=15)
+            plt.xlabel("Epoca",fontsize=15)
+            if(ej != 0):
+                plt.savefig('Informe/678/Acc_t_ej_{}.pdf'.format(ej), format='pdf', bbox_inches='tight')
+                np.savez("Informe/678/datos_ej_{}.npz".format(ej), Loss=loss_v, Acc=acc, Acc_t=t_acc)
+            plt.close()
+            # plt.show()
+        else:
+            np.savez("Informe/678/datos_ej_{}.npz".format(ej), Loss=loss_v, Acc=acc)
+
 
 
 

@@ -24,7 +24,7 @@ class Loss(object):
 class MSE(Loss):
     def __yyZeros(self, y_true, shape_):
         zeros = np.zeros(shape = shape_)
-        zeros[ np.arange(y_true.shape[0]), y_true] = 1
+        zeros[np.arange(y_true.shape[0]), y_true] = 1
         return zeros
     
     def __call__(self, scores, y_true):
