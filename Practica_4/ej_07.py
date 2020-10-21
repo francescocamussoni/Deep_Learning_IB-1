@@ -74,18 +74,10 @@ model.add(tf.keras.layers.ReLU(max_value=1))
 model.compile(
     optimizer=optimizers.Adam(learning_rate=lr),
     loss=losses.MeanSquaredError(name='loss'),
-    # loss=losses.CategoricalCrossentropy(name='loss'),
     # loss=losses.BinaryCrossentropy(name='loss'),
-    # loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
     metrics=[
         metrics.BinaryAccuracy(name='B_Acc'),
         metrics.MeanSquaredError(name='MSE'),
-        #   metrics.CategoricalAccuracy(name='NoEntiendo'),
-        #   metrics.CategoricalCrossentropy(name='Acc_CCE'),
-        #   metrics.Accuracy(name="Acc2"),
-        #   metrics.MeanSquaredError(name='MSE_acc'),
-        # "accuracy",
-        # "mse"
     ])
 
 # Entreno
@@ -117,36 +109,38 @@ predict = model.predict(x_test_n[eg:eg + 1])
 o_encoder = encoder.predict(x_test_n[eg:eg + 1])
 o_encoder = o_encoder[0]
 
-
 # Guardo las imagenes
 img_folder = os.path.join('Figuras', '7')
 if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
-plt.figure()
-plt.tight_layout()
-ax = plt.subplot(6, 1, 1)
-plt.imshow(x_test_n[eg].reshape(28, 28))
-plt.gray()
+# Grafico
+ax = plt.subplot(6, 8, 4)
+ax.imshow(x_test[eg].reshape(28, 28),cmap='Greys_r')
+# plt.gray()
+ax.get_xaxis().set_visible(False)
+ax.get_yaxis().set_visible(False)
+ax = plt.subplot(6, 8, 5)
+ax.imshow(x_test_n[eg].reshape(28, 28),cmap='Greys_r')
+# plt.gray()
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
 for j in range(1, 5):
     for i in range(8):
         ax = plt.subplot(6, 8, 8 * j + i + 1)
-        plt.imshow(o_encoder[:, :, 8 * (j - 1) + i].reshape(4, 4))
-        plt.gray()
+        ax.imshow(o_encoder[:, :, 8 * (j - 1) + i].reshape(4, 4),cmap='Greys_r')
+        # plt.gray()
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
 ax = plt.subplot(6, 1, 6)
-plt.imshow(predict.reshape(28, 28))
-plt.gray()
+ax.imshow(predict.reshape(28, 28),cmap='Greys_r')
+ax.gray()
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
-plt.savefig(
-    os.path.join(img_folder,
-                 'Grafico_{}.png'.format(description),
-                 format="png",
-                 bbox_inches='tight'))
+plt.tight_layout()
+plt.savefig(os.path.join(img_folder, 'Graf_{}.png'.format(description)),
+            format="png",
+            bbox_inches="tight")
 plt.close()
 
 # Grafico
