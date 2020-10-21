@@ -15,7 +15,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
-from CLArg import lr, rf, embedding_dim, epochs, drop_arg, batch_size, description
+from CLArg import lr, rf, epochs, batch_size, description
 
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.datasets import mnist
@@ -48,7 +48,6 @@ x_val_n = np.clip(x_val_n, 0, 1)
 
 # Arquitecura con Convolucionales
 model = keras.models.Sequential(name='Autoencoder_Conv')
-
 model.add(layers.Input(shape=(28, 28, 1)))
 
 # Encoder
@@ -67,27 +66,26 @@ model.add(layers.UpSampling2D())
 # model.add(layers.Conv2D(64, 3, activation=activations.relu, padding='same'))
 model.add(layers.Conv2D(64, 3, activation=activations.relu, padding='valid'))
 model.add(layers.UpSampling2D())
-# model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(1, 3, activation=activations.linear, padding='same'))
-model.add(tf.keras.layers.ReLU(max_value=1))
+model.add(layers.Conv2D(1, 3, activation=activations.sigmoid, padding='same'))
+# model.add(layers.Lambda(lambda x: 0.1*x))
+# model.add(tf.keras.layers.ReLU(max_value=1))
 
 model.compile(
     optimizer=optimizers.Adam(learning_rate=lr),
-    loss=losses.MeanSquaredError(name='loss'),
-    # loss=losses.BinaryCrossentropy(name='loss'),
+    # loss=losses.MeanSquaredError(name='loss'),
+    loss=losses.BinaryCrossentropy(name='loss'),
     metrics=[
         metrics.BinaryAccuracy(name='B_Acc'),
         metrics.MeanSquaredError(name='MSE'),
     ])
 
 # Entreno
-hist = model.fit(
-    x_train_n[:20],
-    x_train[:20],
-    #  validation_data=(x_val_n[:5], x_val[:5]),
-    epochs=1000,
-    batch_size=batch_size,
-    verbose=2)
+hist = model.fit(x_train_n,
+                 x_train,
+                 validation_data=(x_val_n, x_val),
+                 epochs=epochs,
+                 batch_size=batch_size,
+                 verbose=2)
 
 # Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc, test_MSE = model.evaluate(x_test_n, x_test)
@@ -116,25 +114,26 @@ if not os.path.exists(img_folder):
 
 # Grafico
 ax = plt.subplot(6, 8, 4)
-ax.imshow(x_test[eg].reshape(28, 28),cmap='Greys_r')
+ax.imshow(x_test[eg].reshape(28, 28), cmap='Greys_r')
 # plt.gray()
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
 ax = plt.subplot(6, 8, 5)
-ax.imshow(x_test_n[eg].reshape(28, 28),cmap='Greys_r')
+ax.imshow(x_test_n[eg].reshape(28, 28), cmap='Greys_r')
 # plt.gray()
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
 for j in range(1, 5):
     for i in range(8):
         ax = plt.subplot(6, 8, 8 * j + i + 1)
-        ax.imshow(o_encoder[:, :, 8 * (j - 1) + i].reshape(4, 4),cmap='Greys_r')
+        ax.imshow(o_encoder[:, :, 8 * (j - 1) + i].reshape(4, 4),
+                  cmap='Greys_r')
         # plt.gray()
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
 ax = plt.subplot(6, 1, 6)
-ax.imshow(predict.reshape(28, 28),cmap='Greys_r')
-ax.gray()
+ax.imshow(predict.reshape(28, 28), cmap='Greys_r')
+# ax.gray()
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
 plt.tight_layout()
