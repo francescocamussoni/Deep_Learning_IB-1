@@ -21,7 +21,7 @@ hostname
 # Ejercicio 6, con dos capas de 20 neuronas
 python ej_07_Falopeada_MSE.py -lr 1e-5 -rf 0 -e 1000 -bs 512
 python ej_07_Falopeada_MSE.py -lr 1e-4 -rf 0 -e 1000 -bs 512
-python ej_07_Falopeada_MSE.py -lr 1e-3 -rf 0 -e 1000 -bs 512
+# python ej_07_Falopeada_MSE.py -lr 1e-3 -rf 0 -e 1000 -bs 512
 
 
 
