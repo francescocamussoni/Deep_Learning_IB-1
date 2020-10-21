@@ -7,7 +7,7 @@ Author : Facundo Martin Cabrera
 Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
 GitLab: https://gitlab.com/cabre94
-Description:
+Description: https://tensorchiefs.github.io/dl_course/exercises/07_fcn_MNIST_tricks
 """
 
 import os
