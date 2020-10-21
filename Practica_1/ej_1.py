@@ -44,7 +44,7 @@ class ajusteLineal():
         ax = plt.subplot(111)
         
         for i in range(self.N):
-            ax.plot(self.X[:,i+1], self.Y_noise - np.delete(self.X,i+1,axis=1) @ np.delete(self.coef,i+1,axis=0) + self.beta[0], 'o', label='Dim. '.format(i+1)) # A esta es la que le tengo que restar
+            ax.plot(self.X[:,i+1], self.Y_noise - np.delete(self.X,i+1,axis=1) @ np.delete(self.coef,i+1,axis=0) + self.beta[0], 'o', label='Dim. {}'.format(i+1)) # A esta es la que le tengo que restar
         for i in range(self.N-1):
             ax.plot(self.X[:,i+1], self.X[:,i+1] * self.beta[i+1] + self.beta[0], 'k')
         ax.plot(self.X[:,self.N], self.X[:,self.N] * self.beta[self.N] + self.beta[0], 'k', label="Ajuste")

@@ -15,45 +15,43 @@ import numpy as np
 from matplotlib import pyplot as plt
 from keras.datasets import cifar10
 from keras.datasets import mnist
+import ipdb
 
-"""
-import matplotlib as mpl
-mpl.rcParams.update({
-	'font.size': 20,
-	'figure.figsize': [12, 8],
-	'figure.autolayout': True,
-	'font.family': 'serif',
-	'font.sans-serif': ['Palatino']})
-"""
-
-np.random.seed(10)
 
 class LinearClassifier():
     def __init__(self, n):
         self.n = n  #Numero de clases
         pass
-    def fit(self, x_train, y_train, x_test, y_test, size_bacht=50, lr=1e-4, landa=0.001, epochs=500):
+    def fit(self, x_train, y_train, x_test, y_test, size_bacht=50, lr=1e-3, landa=1e-5, epochs=200, normalize=False):
         self.lr = lr
         self.l = landa
         self.epochs = epochs
         self.sbacht = size_bacht
         self.loss = np.array([])
         self.acc = np.array([])
+        self.test_acc = np.array([])
+        # Tuve algunos problemas con el pasaje de argumentos por referencia, por el momento esto lo arregla
+        self.X = np.copy(x_train)       
+        self.X_t = np.copy(x_test)
 
         # Acomodo las entradas del entrenamiento
-        self.X = x_train.reshape(len(x_train), x_train[0].size).astype(np.float)#/255
+        self.X = self.X.reshape(len(self.X), self.X[0].size).astype(np.float)
         self.X = np.hstack((np.ones((len(self.X),1)), self.X))              # Pongo 1 para el bias
         self.Y = y_train.reshape(y_train.size)
 
         # Acomodo las entradas del test
-        self.X_t = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)#/255
+        self.X_t = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)
         self.X_t = np.hstack((np.ones((len(self.X_t),1)), self.X_t))        # Pongo 1 para el bias
         self.Y_t = y_test.reshape(y_test.size)
+
+        if(normalize):
+            self.X   /= 255
+            self.X_t /= 255
 
         # Inicializo W
         self.W = np.random.uniform(-10, 10, size=(self.n, self.X.shape[1]))
 
-        n_bacht = int(len(x_train)/self.sbacht)  # Cuantos bacht tengo
+        n_bacht = int(len(x_train)/self.sbacht)  # Cuantos bacht tengo, pueden que me queden imagenes afuera. Arreglar
 
         # Recorro las epocas        
         for e in range(self.epochs):
@@ -73,21 +71,25 @@ class LinearClassifier():
                 
                 self.W -= self.lr * dw
             
-            print(e," ",c_acc/n_bacht)
+            if (e % 10 == 0):
+                print(e,"/",self.epochs," ",c_acc/n_bacht)
             
-            self.loss = np.append(self.loss, c_loss/n_bacht)
-            self.acc  = np.append(self.acc,   c_acc/n_bacht)
+            self.loss = np.append(self.loss, c_loss/n_bacht)        # Me dijeron que tome el promedio, pero no me gusta
+            self.acc  = np.append(self.acc,   c_acc/n_bacht)        # Me dijeron que tome el promedio, pero no me gusta
+            predict_test = self.predict(self.X_t)
+            self.test_acc = np.append(self.test_acc, self.accuracy(self.Y_t, predict_test))
         
-        test_predict = self.predict(self.X_t)
+        #test_predict = self.predict(self.X_t)
+
+        #self.acc_test = self.accuracy(test_predict, self.Y_t)
 
         print("Precision final con los datos de entrenamiento: ", self.acc[-1])
-        print("Precision con los datos de test: ", self.accuracy(test_predict, self.Y_t))
+        print("Precision final con los datos de test: ", self.test_acc[-1])
         
-
         self.e = np.arange(self.epochs)
 
-        self.plotLoss()
-        self.plotAcurracy()
+        #self.plotLoss()
+        #self.plotAcurracy()
 
     def plotLoss(self):
 
@@ -100,7 +102,6 @@ class LinearClassifier():
         plt.show()
 
     def predict(self, x_testt):
-        #import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
         if(self.X.shape[1] != x_testt.shape[1]):
             x_testt = x_testt.reshape(len(x_testt), x_testt[0].size).astype(np.float)
             x_testt = np.hstack((np.ones((len(x_testt),1)), x_testt))
@@ -114,20 +115,24 @@ class LinearClassifier():
         accuracy = (np.sum(y_true == y_pred) / len(y_true))
         return accuracy*100
     
-    def getLoss(self):
+    def getLoss(self):      # Por si quiero graficar afuera
         return self.loss
     
-    def getAccuracy(self):
+    def getAccuracy(self):  # Por si quiero graficar afuera
         return self.acc
+    
+    def getAccTest(self):
+        return self.test_acc[-1]
+    
+    def getAccuracyTest(self):
+        return self.test_acc
 
 
 class SVM(LinearClassifier):
-    def __init__(self, n, delta=1):
+    def __init__(self, n,delta=1):
         super(SVM, self).__init__(n)
         self.delta = delta
     def loss_gradient(self, X, Y):
-        #super(SVM, self)
-        super()
         # Las dimensiones del batch ya deberian estar acomodadas
 
         scores = np.dot(self.W, X.T)         #Calculo los Scores
@@ -140,223 +145,385 @@ class SVM(LinearClassifier):
 
         # Intento restar cada score a su columna (ie imagen) correspondiente
         resta = scores - y_win[np.newaxis,:] + self.delta
-        resta[Y, idx] = 0                   # y acomodo los 0 de los que deberian ganar
-        resta[resta<0] = 0
+        resta[Y, idx] = 0                   # y acomodo a 0 los que deberian ganar
+        resta[resta<0] = 0                  # Mato todo lo que es negativo
 
-        L = resta.sum(axis=0)
-        loss = np.mean(L) + 0.5 * self.l * np.sum(self.W * self.W)
+        loss = (resta.sum() / Y.size) + 0.5 * self.l * np.sum(self.W * self.W)
 
+        resta[resta>0] = 1                  # Lo que queda es solo positivo y lo mando a 1
 
-        #loss = (resta.sum() / Y.size) + 0.5 * self.l * np.sum(self.W * self.W)
-
-        resta[resta>0] = 1
-
-        resta[Y, idx] -= resta.sum(axis=0)[idx]
+        resta[Y, idx] -= resta.sum(axis=0)[idx]     # El lugar debe ganar tiene la resta de todos los que le ganaron
 
         dw = (np.dot(resta, X) / self.sbacht ) + self.l * self.W
 
         return loss, dw
     
-    def loss_gradient2(self,x,y):
-        super()
-        self.delta=1#-1
-        self.lambda_L2 = 0.5
-        L2= np.sum(self.W*self.W)
-
-        id= np.arange(x.shape[0], dtype=np.int)
-        #yp=self.activacion(x)
-        yp = np.dot(self.W, x.T)
-        y=y.reshape(x.shape[0]) #por sino es como yo quiero
-
-        diff = yp - yp[y,id] + self.delta
-        diff = np.maximum(diff, 0)
-        diff[y, np.arange(x.shape[0])]=0 
-
-        #sumo intra-vector, ahora tengo un [batchsize,(1)]  
-        L=diff.sum(axis=0)
-        loss = np.mean(L) + 0.5*self.lambda_L2*L2
-
-        # 'y' tiene las posiciones de la solucion 
-        # es genial porque las puedo usar para forzar el 0 donde debe ir
-        diff=np.heaviside(diff,0)
-        diff[y, id] -= diff.sum(axis=0)[id]
-
-        dW = np.dot(diff, x)/x.shape[0] + self.lambda_L2*self.W
-        return loss, dW
-
 
 class Softmax(LinearClassifier):
     def __init__(self, n, delta=1):
         super(Softmax, self).__init__(n)
         self.delta = delta
     def loss_gradient(self, X, Y):
-        #super(SVM, self)
         super()
 
-        scores = np.dot(self.W, X.T)         #Calculo los Scores
+        scores = np.dot(self.W, X.T)                #Calculo los Scores
 
-        #import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
-
-        # Le resto el score maximo para que sea mas estable
-        #scores = scores - scores.max(axis=0)
-        scores -= np.max(scores, axis=0)[np.newaxis,:]
+        scores = scores - scores.max(axis=0)        # Le resto el score maximo para que sea mas estable
 
         # Ok, tengo los scores. Quiero ver cual deberia ganar de cada columna (una columna es una imagen)
         # El primer indice es el Score que debe ganar y el segundo el numero de imagen
         idx = np.arange(0,Y.size)
-
         y_win = scores[Y, idx]          # Creo que con esto deberia poder quedarme con los scores que deben ganar
 
-        exp = np.exp(scores)
+        exp = np.exp(scores)            # Tomo las exponenciales de cada Score 
 
-        sumatoria = exp.sum(axis=0)
+        sumatoria = exp.sum(axis=0)         # Necesitamos la sumatoria de todas las exponenciales
 
-        L = np.log(sumatoria) - y_win
+        softmax_fun = exp * (1.0/sumatoria)     # Calculo la Softmax de cada imagen
 
-        loss = L.mean() + 0.5 * self.l * np.sum(self.W * self.W)
+        softmax_fun[Y, idx] -= 1               # Le resto la delta de Kronecker a las que tienen que ganar
 
+        #log_softmax = np.log(sumatoria) - y_win
+        log_softmax = np.log(sumatoria) - y_win             # Calculamos el log Softmax de cada imagen
+                                                            # Creo que no es estrictamente la softmax, pero se entiende
 
+        loss = log_softmax.mean() + 0.5 * self.l * np.sum(self.W * self.W)      # Promedio todas las imagenes y sumo
+                                                                                # regularizacion
 
+        #inv_sumatoria = 1.0/sumatoria
 
-        ################################################
-        inv_sumatoria = 1.0/sumatoria
-
-        grad = inv_sumatoria *exp
+        #grad = inv_sumatoria *exp
         
-        #import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
+        #grad[Y, idx] -= 1
 
-        grad[Y, idx] -= 1
+        #ipdb.set_trace(context=15)
 
-        dw = (np.dot(grad, X) / self.sbacht ) + self.l * self.W
+        dw = (np.dot(softmax_fun, X) / self.sbacht ) + self.l * self.W      # Me hace ruido este producto, pero
+                                                            # por las dimensiones es lo unico que tiene sentido
 
         return loss, dw
 
-        #import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
 
 
 
+def ejercicio_5_Softmax(c='mnist', epocas=100):
+    np.random.seed(10)
+
+    if(c == 'mnist'):
+        (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    elif(c == 'cifar10'):
+        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+    
+    soft = Softmax(10)
+
+    print("Sofmax - {}".format(c))
+
+    soft.fit(x_train, y_train, x_test, y_test, epochs=epocas, normalize=False)
+
+    e = np.arange(epocas)
+    coste = soft.getLoss()
+
+    plt.plot(e, coste)
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Funcion de coste", fontsize=15)
+    #plt.legend(loc="best")
+    plt.tight_layout()
+    plt.savefig('Informe/5/Loss_{}_e{}.pdf'.format(c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.show()
 
+    acc = soft.getAccuracy()
+
+    plt.plot(e, acc)
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy", fontsize=15)
+    #plt.legend(loc="best")
+    plt.tight_layout()
+    plt.savefig('Informe/5/Accuracy_{}_e{}.pdf'.format(c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.show()
 
+    acc_t = soft.getAccuracyTest()
+
+    plt.plot(e, acc_t)
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy Test", fontsize=15)
+    #plt.legend(loc="best")
+    plt.tight_layout()
+    plt.savefig('Informe/5/AccuracyTest_{}_e{}.pdf'.format(c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.show()
+
+def ejercicio_5_SVM(c='mnist', epocas=100):
+    np.random.seed(10)
+
+
+    if(c == 'mnist'):
+        (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    elif(c == 'cifar10'):
+        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+    
+    svm = SVM(10)
+
+    print("SVM - {}".format(c))
+
+    svm.fit(x_train, y_train, x_test, y_test, epochs=epocas, normalize=False)
+
+    e = np.arange(epocas)
+    coste = svm.getLoss()
+
+    plt.plot(e, coste, label=r"lr=1e-1")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Funcion de coste", fontsize=15)
+    #plt.legend(loc="best")
+    plt.tight_layout()
+    plt.savefig('Informe/5/SVM_Loss_{}_e{}.pdf'.format(c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.show()
+
+    acc = svm.getAccuracy()
+
+    plt.plot(e, acc)
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy", fontsize=15)
+    #plt.legend(loc="best")
+    plt.tight_layout()
+    plt.savefig('Informe/5/SVM_Accuracy_{}_e{}.pdf'.format(c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.show()
 
+    acc_t = svm.getAccuracyTest()
 
+    plt.plot(e, acc_t)
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy Test", fontsize=15)
+    #plt.legend(loc="best")
+    plt.tight_layout()
+    plt.savefig('Informe/5/SVM_AccuracyTest_{}_e{}.pdf'.format(c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.show()
 
+def ejercicio_5_Comparar(c='mnist', epocas=100):
+    np.random.seed(10)
 
+    if(c == 'mnist'):
+        (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    elif(c == 'cifar10'):
+        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+    
+    ###### Softmax
+    soft = Softmax(10)
 
-# Numero de clases
-#n = 10
-#n_samples = 4
+    print("Sofmax - {}".format(c))
 
-#(x_train, y_train), (x_test, y_test) = cifar10.load_data()
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
+    soft.fit(x_train, y_train, x_test, y_test, epochs=epocas)
 
+    softmax_coste = soft.getLoss()
+    softmax_acc   = soft.getAccuracy()
+    softmax_acc_test   = soft.getAccuracyTest()
 
-svm = SVM(10)
-#svm.fit(X,Y,X_test,Y_test)
-svm.fit(x_train, y_train, x_test, y_test)
+    ###### SVM
+    svm = SVM(10)
 
+    print("SVM - {}".format(c))
 
+    svm.fit(x_train, y_train, x_test, y_test, epochs=epocas)
 
-"""
-sof = Softmax(10)
-#svm.fit(X,Y,X_test,Y_test)
-sof.fit(x_train, y_train, x_test, y_test)
-"""
+    svm_coste = svm.getLoss()
+    svm_acc   = svm.getAccuracy()
+    svm_acc_test   = svm.getAccuracyTest()
+    
+    #### GRAFICO
 
+    e = np.arange(epocas)
 
+    plt.figure()
 
-"""
-X = x_train[:n_samples]
-Y = y_train[:n_samples]
+    plt.plot(e, softmax_coste, label=r"Softmax")
+    plt.plot(e, svm_coste, label=r"SVM")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Funcion de coste", fontsize=15)
+    plt.legend(loc="best")
+    plt.tight_layout()
+    plt.savefig('Informe/5/Comparacion_Coste_{}_e{}.pdf'.format(c,epocas), format='pdf', bbox_inches='tight')
+    #plt.pause(1)
+    plt.close()
+    #plt.show()
+
+    plt.figure()
+
+    plt.plot(e, softmax_acc, label=r"Softmax")
+    plt.plot(e, svm_acc, label=r"SVM")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy Entrenamiento", fontsize=15)
+    plt.legend(loc="best")
+    plt.tight_layout()
+    plt.savefig('Informe/5/Comparacion_Precision_{}_e{}.pdf'.format(c,epocas), format='pdf', bbox_inches='tight')
+    #plt.pause(1)
+    plt.close()
+    #plt.show()
+
+    plt.figure()
+
+    plt.plot(e, softmax_acc_test, label=r"Softmax")
+    plt.plot(e, svm_acc_test, label=r"SVM")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy Test", fontsize=15)
+    plt.legend(loc="best")
+    plt.tight_layout()
+    plt.savefig('Informe/5/Comparacion_Precision_TEST_{}_e{}.pdf'.format(c,epocas), format='pdf', bbox_inches='tight')
+    #plt.pause(1)
+    plt.close()
+    #plt.show()
+
+
+
+ejercicio_5_Softmax(c='mnist',epocas=200)
+ejercicio_5_SVM(c='mnist',epocas=200)
+
+ejercicio_5_Comparar(c='mnist',epocas=200)
+ejercicio_5_Comparar(c='cifar10', epocas=200)
+
+
+
+
+
+
+def barridoParametros(method='SVM',c='mnist', epocas=200):
+    np.random.seed(10)
+
+    if(c == 'mnist'):
+        (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    elif(c == 'cifar10'):
+        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+
+
+    lear_rate = [1e-2, 1e-3, 1e-4, 1e-5]
+    loss_g = []
+    acc_g  = []
+    acc_t  = []
+
+    for i in lear_rate:
+        if(method == 'SVM'):
+            svm = SVM(10)
+        elif(method == 'Softmax'):
+            svm = Softmax(10)
+        svm.fit(x_train, y_train, x_test, y_test, lr=i, epochs=epocas)
+
+        loss_g += [svm.getLoss()]
+        acc_g += [svm.getAccuracy()]
+        acc_t += [svm.getAccuracyTest()]
+
+    loss_g = np.array(loss_g)
+    acc_g = np.array(acc_g)
+    acc_t = np.array(acc_t)
+
+    e = np.arange(epocas)
+
+    plt.figure()
+    plt.plot(e, loss_g[0], label=r"lr=1e-2")
+    plt.plot(e, loss_g[1], label=r"lr=1e-3")
+    plt.plot(e, loss_g[2], label=r"lr=1e-4")
+    plt.plot(e, loss_g[3], label=r"lr=1e-5")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Funcion de coste", fontsize=15)
+    plt.legend(loc="best")
+    plt.savefig('Informe/5/{}_Barrido_lr_loss_{}_e{}.pdf'.format(method,c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.pause(1)
+    #plt.show()
+
+    plt.figure()
+    plt.plot(e, acc_g[0], label=r"lr=1e-2")
+    plt.plot(e, acc_g[1], label=r"lr=1e-3")
+    plt.plot(e, acc_g[2], label=r"lr=1e-4")
+    plt.plot(e, acc_g[3], label=r"lr=1e-5")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy Training", fontsize=15)
+    plt.legend(loc="best")
+    plt.savefig('Informe/5/{}_Barrido_lr_acc_{}_e{}.pdf'.format(method,c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.pause(1)
+    #plt.show()
+
+    plt.figure()
+    plt.plot(e, acc_t[0], label=r"lr=1e-2")
+    plt.plot(e, acc_t[1], label=r"lr=1e-3")
+    plt.plot(e, acc_t[2], label=r"lr=1e-4")
+    plt.plot(e, acc_t[3], label=r"lr=1e-5")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy Test", fontsize=15)
+    plt.legend(loc="best")
+    plt.savefig('Informe/5/{}_Barrido_lr_accTest_{}_e{}.pdf'.format(method,c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.pause(1)
+    #plt.show()
+
+    
+
+    # Ahora pruebo variando lambda
+    lambda_v = [1e-2, 1e-3, 1e-4]
+    loss_g_2 = []
+    acc_g_2  = []
+    acc_t_2  = []
+
+    for i in lambda_v:
+        if(method == 'SVM'):
+            svm = SVM(10)
+        elif(method == 'Softmax'):
+            svm = Softmax(10)
+        svm.fit(x_train, y_train, x_test, y_test, landa=i, epochs=epocas)
+
+        loss_g_2 += [svm.getLoss()]
+        acc_g_2 += [svm.getAccuracy()]
+        acc_t_2 += [svm.getAccuracyTest()]
+
+    loss_g = np.array(loss_g)
+    acc_g = np.array(acc_g)
+    acc_t = np.array(acc_t)
+
+    e = np.arange(epocas)
+
+    plt.figure()
+    plt.plot(e, loss_g_2[0], label=r"$\lambda=1e-2$")
+    plt.plot(e, loss_g_2[1], label=r"$\lambda=1e-3$")
+    plt.plot(e, loss_g_2[2], label=r"$\lambda=1e-4$")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Funcion de coste", fontsize=15)
+    plt.legend(loc="best")
+    plt.savefig('Informe/5/{}_Barrido_lambda_acc_{}_e{}.pdf'.format(method,c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.pause(1)
+    #plt.show()
+
+    plt.figure()
+    plt.plot(e, acc_g_2[0], label=r"$\lambda=1e-2$")
+    plt.plot(e, acc_g_2[1], label=r"$\lambda=1e-3$")
+    plt.plot(e, acc_g_2[2], label=r"$\lambda=1e-4$")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy Training", fontsize=15)
+    plt.legend(loc="best")
+    plt.savefig('Informe/5/{}_Barrido_lambda_acc_{}_e{}.pdf'.format(method,c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.pause(1)
+    #plt.show()
+
+    plt.figure()
+    plt.plot(e, acc_t_2[0], label=r"$\lambda=1e-2$")
+    plt.plot(e, acc_t_2[1], label=r"$\lambda=1e-3$")
+    plt.plot(e, acc_t_2[2], label=r"$\lambda=1e-4$")
+    plt.xlabel("Epoca", fontsize=15)
+    plt.ylabel("Accuracy Test", fontsize=15)
+    plt.legend(loc="best")
+    plt.savefig('Informe/5/{}_Barrido_lambda_acc_{}_e{}.pdf'.format(method,c,epocas), format='pdf', bbox_inches='tight')
+    plt.close()
+    #plt.pause(1)
+    #plt.show()
+
+
+barridoParametros(method='SVM'    ,c='mnist'  ,epocas=250)
+barridoParametros(method='Softmax',c='mnist'  ,epocas=250)
+barridoParametros(method='SVM'    ,c='cifar10',epocas=250)
+barridoParametros(method='Softmax',c='cifar10',epocas=250)
 
-X_test = x_test[:20]
-Y_test = y_test[:20]
 
-x_train = x_train.reshape(len(x_train), x_train[0].size)
-y_train = y_train.reshape( y_train.size)
-
-svm = SVM(10)
-#svm.fit(X,Y,X_test,Y_test)
-svm.fit(x_train, y_train, x_test, y_test)
-
-
-Y_test = Y_test.reshape(Y_test.size)
-
-X_test = X_test.reshape(len(X_test), X[0].size)
-X_test = np.hstack((np.ones((len(X_test),1)), X_test))
-
-a = svm.predict(X_test)
-"""
-
-
-
-
-
-
-
-
-"""
-delta = 1
-landa = 1
-
-#X.shape = (#ejemplos, dim(x)+1)
-#W.shape = (#clases, dim(x)+1)
-#Scores = np.dot(X,W.T)
-
-
-X = X.reshape(len(X), X[0].size)        # Reacomodo la entrada                                  LISTO
-
-X = np.hstack((np.ones((len(X),1)), X))  # Pongo 1 para el bias                                 LISTO
-
-W = np.random.uniform(0, 1, size=(n, X.shape[1]))   # Invento la W                              LISTO
-
-Scores = np.dot(W, X.T)         #Calculo los Scores                                             LISTO
-
-
-
-# Ok, tengo los scores. Quiero ver cual deberia ganar de cada columna (una columna es una imagen)
-
-# El primer indice es el Score que debe ganar y el segundo el numero de imagen
-idx = np.arange(0,n_samples)                                                                     #LISTO
-
-Y = Y.reshape(Y.size)           # Aca tuve que reacomodar Y porque tiene un formato feo          LISTO
-
-# Creo que con esto deberia poder quedarme con los scores que deben ganar
-y_win = Scores[Y, idx]                                                                          #LISTO
-
-
-# Intento restar cada score a su columna (ie imagen) correspondiente
-
-resta = Scores - y_win[np.newaxis,:] + delta                                                    #LISTO
-
-#import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
-
-#resta = np.maximum(resta, 0)        # Ahora mato todo lo que no sea positivo                    #LISTO
-resta2 = np.heaviside(resta,0)
-
-#resta[Y, idx] = 0           # y acomodo los 0 de los que deberian ganar                         #LISTO
-resta2[Y, idx] = 0           # y acomodo los 0 de los que deberian ganar                         #LISTO
-print(resta)                                                                                    #LISTO 
-
-
-
-#resta[resta>0] = 1                                                                              #LISTO
-# import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
-
-# ME FALTA SUMAR TODA UNA COLUMNA Y PONERLA EN EL LUGAR QUE TIENE QUE GANAR!!!!!!!!!!!!!!!!!!!!
-
-resta[Y, idx] -= resta.sum(axis=0)[idx]
-#resta[Y,:] -= resta.sum(axis=0)
-
-
-
-dw = (np.dot(resta, X) / n ) + landa * W
-"""
-
-
-
-
-
-
-"""
-Metrica accuracy
-"""

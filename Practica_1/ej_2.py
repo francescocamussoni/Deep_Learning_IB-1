@@ -115,9 +115,10 @@ class createCluster():
 
 
 # Para armar el video
-#fig = plt.figure()
-#ims = []
-
+fig = plt.figure()
+ims = []
+plt.xticks([])
+plt.yticks([])
 
 class kMeans():
     def __init__(self, N=3, k=4, n_iter=100):
@@ -156,19 +157,21 @@ class kMeans():
             
             
             if(plot):                                   # Ploteo solo las 2 primeras dimensiones
-                # aux = []  # Para armar el video
+                aux = []  # Para armar el video
                 plt.gca().set_prop_cycle(None)
                 for i in range(self.k):
-                    plt.scatter(self.cluster[i][:,0], self.cluster[i][:,1], marker='.' )
-                    plt.scatter(self.means[i][0], self.means[i][1], c='k', marker='x')
-                    #aux.append( plt.scatter(self.cluster[i][:,0], self.cluster[i][:,1], marker='.' ))
-                    #aux.append( plt.scatter(self.means[i][0], self.means[i][1], c='k', marker='x')  )
-                #ims.append( (aux) )
+                    #plt.scatter(self.cluster[i][:,0], self.cluster[i][:,1], marker='.' )
+                    #plt.scatter(self.means[i][0], self.means[i][1], c='k', marker='x')
+                    aux.append( plt.scatter(self.cluster[i][:,0], self.cluster[i][:,1], marker='.' ))
+                    aux.append( plt.scatter(self.means[i][0], self.means[i][1], c='k', marker='x')  )
+                plt.xticks([])
+                plt.yticks([])
+                ims.append( (aux) )
                 #plt.title(r'p=4  k={}   iteracion = {}'.format(self.k,count))
                 #plt.savefig('Informe/2/2_{}_{}.pdf'.format(self.k,count), format='pdf', bbox_inches='tight')
                 plt.pause(1)
                 #plt.close()
-                plt.clf()
+                #plt.clf()
                 #plt.show()
             
             count += 1
@@ -185,19 +188,22 @@ N = 3
 kk = createCluster(N)
 data = kk.createData()
 cluster = kk.getClusters()
-#aux = []       # Para armar el video
+aux = []       # Para armar el video
 
 
 for i in range(len(cluster)):                           # Grafico la distribucion original
     plt.scatter(cluster[i][:,0], cluster[i][:,1], marker='.')
 
-#for _ in range(4):     # Para armar el video
-#    ims.append((aux))  # Para armar el video
+for _ in range(4):     # Para armar el video
+    ims.append((aux))  # Para armar el video
 
-plt.title(r"Distribucion cluster con $p=4$")
-#plt.savefig('Informe/2/2_Distribucion_Clusters.pdf', format='pdf', bbox_inches='tight')
+# plt.title(r"Distribucion cluster con $p=4$")
+# plt.savefig('Informe/2/2_Distribucion_Clusters.pdf', format='pdf', bbox_inches='tight')
+plt.xticks([])
+plt.yticks([])
 plt.pause(3)
-plt.clf()
+# plt.close()
+# plt.clf()
 
 
 
@@ -212,15 +218,19 @@ for i in range(2,6):                        # Ejecuto el algoritmo para k desde 
 # Ahora con una distribucion que no funciona
 ##########################
 
+"""
+
 kk2 = createCluster(2)
 dataFea = kk2.uglyData()
 clusterFeo = kk2.uglyCluster()
 
 plt.scatter(clusterFeo[0][:,0], clusterFeo[0][:,1], marker='.', color='red')
 plt.scatter(clusterFeo[1][:,0], clusterFeo[1][:,1], marker='.', color='blue')
-#plt.savefig('Informe/2/2_FEO.pdf', format='pdf', bbox_inches='tight')
+plt.xticks([])
+plt.yticks([])
+# plt.savefig('Informe/2/2_FEO.pdf', format='pdf', bbox_inches='tight')
 plt.pause(3)
-plt.clf()
+# plt.clf()
 #plt.show()
 
 knn2 = kMeans(N=2,k=2)
@@ -228,8 +238,9 @@ knn2.execute(dataFea)
 
 
 
-# De aca para abajo es para armar el video, asi que lo comento
 """
+# De aca para abajo es para armar el video, asi que lo comento
+
 import matplotlib.animation as animation
 
 
@@ -239,4 +250,3 @@ im_ani = animation.ArtistAnimation(fig, ims, interval=1000, repeat_delay=3000,
 plt.show()
 
 im_ani.save('Intento.mp4', metadata={'artist':'FMC'})
-"""
