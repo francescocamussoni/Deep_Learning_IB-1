@@ -76,6 +76,6 @@ description = 'lr={:.1e}_rf={}_do={}_epochs={}_bs={}_nn={}_ed={}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim)
     
 print("\n-------------------------------------")
-print('lr: {:.1e} rf: {} do: {} epochs: {} bs: {} nn: {} ed: {}'.format(
+print('lr: {:.1e} rf: {:.1e} do: {} epochs: {} bs: {} nn: {} ed: {}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim))
 print("-------------------------------------\n")
