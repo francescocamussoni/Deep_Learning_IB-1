@@ -19,9 +19,9 @@ source activate deep_learning
 hostname
 
 # Ejercicio 6, con dos capas de 20 neuronas
-python ej_06.py -lr 1e-5 -rf 0 -e 500 -bs 256
-python ej_06.py -lr 1e-4 -rf 0 -e 500 -bs 256
-python ej_06.py -lr 1e-3 -rf 0 -e 500 -bs 256
+python ej_07_L_MSE.py -lr 1e-5 -rf 0 -e 500 -bs 256
+python ej_07_L_MSE.py -lr 1e-4 -rf 0 -e 500 -bs 256
+python ej_07_L_MSE.py -lr 1e-3 -rf 0 -e 500 -bs 256
 
 
 
