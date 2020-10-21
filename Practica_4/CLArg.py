@@ -72,7 +72,7 @@ drop_arg = kwargs['Dropout']
 nn = kwargs['NumNeuronas']
 embedding_dim = kwargs['EmbeddingDim']
 
-description = 'lr={:.1e}_rf={}_do={}_epochs={}_bs={}_nn={}_ed={}'.format(
+description = 'lr={:.1e}_rf={:.1e}_do={}_epochs={}_bs={}_nn={}_ed={}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim)
     
 print("\n-------------------------------------")
