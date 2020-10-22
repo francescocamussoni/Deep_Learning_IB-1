@@ -63,6 +63,13 @@ parser.add_argument(
     default=100,
     help="Dimension de salida del embedding (default: 100)",
 )
+parser.add_argument(
+    # "-lr",
+    "--dataset",
+    type=str,
+    default='cifar10',
+    help="Dataset (default: cifar10)",
+)
 kwargs = vars(parser.parse_args())
 lr = kwargs["learning_rate"]
 rf = kwargs["regularizer_factor"]
@@ -71,6 +78,7 @@ batch_size = kwargs['batch_size']
 drop_arg = kwargs['Dropout']
 nn = kwargs['NumNeuronas']
 embedding_dim = kwargs['EmbeddingDim']
+dataset = kwargs["dataset"]
 
 description = 'lr={:.1e}_rf={:.1e}_do={}_epochs={}_bs={}_nn={}_ed={}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim)
