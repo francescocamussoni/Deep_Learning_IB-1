@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -N o_8_Dense
+#$ -N o_8_Conv
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash

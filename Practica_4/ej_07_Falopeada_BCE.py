@@ -90,7 +90,7 @@ hist = model.fit(x_train_n,
 test_loss, test_Acc, test_MSE = model.evaluate(x_test_n, x_test)
 
 # Guardo los datos
-data_folder = os.path.join('Datos', '7_Internet_MSE')
+data_folder = os.path.join('Datos', '7_Internet_BCE')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 model.save(os.path.join(data_folder, '{}.h5'.format(description)))
@@ -103,7 +103,7 @@ embedded = keras.models.Model(model.input, model.get_layer('embedded').output)
 eg = np.random.randint(0, x_test_n.shape[0])
 
 # # Guardo las imagenes
-img_folder = os.path.join('Figuras', '7_Internet_MSE')
+img_folder = os.path.join('Figuras', '7_Internet_BCE')
 if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
