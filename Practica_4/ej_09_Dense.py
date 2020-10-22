@@ -103,14 +103,14 @@ hist = model.fit(x_train,
 test_loss, test_Acc = model.evaluate(x_test, y_test)
 
 # Guardo los datos
-data_folder = os.path.join('Datos', '8_Dense')
+data_folder = os.path.join('Datos', '9_Dense')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 model.save(os.path.join(data_folder, '{}.h5'.format(description)))
 np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 # Guardo las imagenes
-img_folder = os.path.join('Figuras', '8_Dense')
+img_folder = os.path.join('Figuras', '9_Dense')
 if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
