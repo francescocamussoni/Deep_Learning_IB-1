@@ -133,7 +133,7 @@ hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
                  steps_per_epoch=len(x_train) / batch_size,
                  validation_data=(x_val, y_val),
                 #  workers=4,
-                 verbose=1)
+                 verbose=2)
 
 # Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc = model.evaluate(x_test, y_test)
