@@ -19,7 +19,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
-from CLArg import lr, rf, epochs, batch_size, drop_arg, description
+from CLArg import lr, epochs, batch_size, description
 from CLArg import dataset
 
 from sklearn.model_selection import train_test_split
@@ -42,14 +42,17 @@ elif dataset == 'cifar100':
     n_classes = 100
 
 # Los junto porque quiero splitearlos distinto
-x, y = np.vstack((x_train, x_test)), np.vstack((y_train, y_test))
+x_train, y_train = np.vstack((x_train, x_test)), np.vstack((y_train, y_test))
 # Separo los datos de test
-x, x_test, y, y_test = train_test_split(x, y, test_size=9000, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=9000,
+                                                    stratify=y_train)
 # Ahora separo entre training y validacion
-x_train, x_val, y_train, y_val = train_test_split(x,
-                                                  y,
+x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                  y_train,
                                                   test_size=9000,
-                                                  stratify=y)
+                                                  stratify=y_train)
 
 # Normalizacion
 media = x_train.mean(axis=0)
@@ -61,6 +64,11 @@ x_test = x_test - media
 x_test /= sigma
 x_val = x_val - media
 x_val /= sigma
+
+# Paso los labels a one-hot encoded
+y_train = keras.utils.to_categorical(y_train, n_classes)
+y_test = keras.utils.to_categorical(y_test, n_classes)
+y_val = keras.utils.to_categorical(y_val, n_classes)
 
 # Arquitectura de la mini-AlexNet
 model = keras.models.Sequential(name='Mini-AlexNet')
@@ -109,7 +117,7 @@ IDG = ImageDataGenerator(
     brightness_range=[0.5, 1.5],  # Cuanto puede variar el brillo
     shear_range=0.,  # No entendi que es
     zoom_range=0.,  # Por lo que vi, queda re feo asi que no lo uso
-    fill_mode='nearest',  # Yo llena las cosas
+    fill_mode='nearest',  # Estrategia para llenar los huecos
     horizontal_flip=True,  # Reflexion horizontal b -> d
     vertical_flip=True,  # Reflexion vertical ! -> ¡
     # Con esto alcanza creo, el resto no tengo tan claro como funciona
@@ -123,8 +131,9 @@ IDG = ImageDataGenerator(
 hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
                  epochs=epochs,
                  steps_per_epoch=len(x_train) / batch_size,
-                 validation_data=(x_test, y_test),
-                 verbose=2)
+                 validation_data=(x_val, y_val),
+                #  workers=4,
+                 verbose=1)
 
 # Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc = model.evaluate(x_test, y_test)
