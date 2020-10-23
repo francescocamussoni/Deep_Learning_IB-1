@@ -7,7 +7,10 @@ Author : Facundo Martin Cabrera
 Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
 GitLab: https://gitlab.com/cabre94
-Description:
+Description: 
+https://machinelearningmastery.com/how
+-to-configure-image-data-augmentation-when-training
+-deep-learning-neural-networks/
 """
 
 import argparse
@@ -64,7 +67,7 @@ model = keras.models.Sequential(name='Mini-AlexNet')
 
 model.add(layers.Input(shape=(32, 32, 3)))
 
-model.add(layers.Conv2D(64, 5, strides=2, activation='relu', padding='valid'))
+model.add(layers.Conv2D(96, 5, strides=2, activation='relu', padding='valid'))
 # model.add(layers.Conv2D(32,5,strides=2,activation='relu',padding='same'))
 model.add(layers.MaxPool2D(3, strides=1))
 # model.add(layers.MaxPool2D(2,strides=1))
@@ -88,7 +91,7 @@ model.add(layers.BatchNormalization())
 
 model.add(layers.Dense(512, activation='relu'))
 model.add(layers.Dense(512, activation='relu'))
-model.add(layers.Dense(10, activation='linear'))
+model.add(layers.Dense(n_classes, activation='linear'))
 
 model.summary()
 
@@ -96,9 +99,71 @@ model.compile(optimizer=optimizers.Adam(learning_rate=lr),
               loss=losses.CategoricalCrossentropy(from_logits=True),
               metrics=[metrics.CategoricalAccuracy(name='CAcc')])
 
+IDG = ImageDataGenerator(
+    # Ang max de rotaciones
+    rotation_range=30,
+    # Cant de pixeles que puede trasladarse, sepuede pasar una
+    # fraccion de la dimension en vez de un entero
+    width_shift_range=5,
+    height_shift_range=5,
+    brightness_range=[0.5, 1.5],  # Cuanto puede variar el brillo
+    shear_range=0.,  # No entendi que es
+    zoom_range=0.,  # Por lo que vi, queda re feo asi que no lo uso
+    fill_mode='nearest',  # Yo llena las cosas
+    horizontal_flip=True,  # Reflexion horizontal b -> d
+    vertical_flip=True,  # Reflexion vertical ! -> ¡
+    # Con esto alcanza creo, el resto no tengo tan claro como funciona
+    # y prefiero dejarlo asi
+)
 
+# Only required if featurewise_center or featurewise_std_normalization
+# or zca_whitening are set to True.
+# IDG.fit(x_train)
 
+hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
+                 epochs=epochs,
+                 steps_per_epoch=len(x_train) / batch_size,
+                 validation_data=(x_test, y_test),
+                 verbose=2)
 
+# Calculo la loss y Accuracy para los datos de test
+test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+data_folder = os.path.join('Datos', '10_AlexNet' + dataset)
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
+# Guardo las imagenes
+img_folder = os.path.join('Figuras', '10_AlexNet' + dataset)
+if not os.path.exists(img_folder):
+    os.makedirs(img_folder)
+
+# Grafico
+plt.plot(hist.history['loss'], label="Loss Training")
+plt.plot(hist.history['val_loss'], label="Loss Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
+plt.xlabel("Epocas", fontsize=15)
+plt.ylabel("Loss", fontsize=15)
+plt.legend(loc='best')
+plt.tight_layout()
+plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
+            format="png",
+            bbox_inches="tight")
+plt.close()
+
+plt.plot(hist.history['CAcc'], label="Acc. Training")
+plt.plot(hist.history['val_CAcc'], label="Acc. Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
+plt.xlabel("Epocas", fontsize=15)
+plt.ylabel("Accuracy", fontsize=15)
+plt.legend(loc='best')
+plt.tight_layout()
+plt.savefig(os.path.join(img_folder, 'Acc_{}.png'.format(description)),
+            format="png",
+            bbox_inches="tight")
+plt.close()
 
 # Layer (type)                 Output Shape              Param #
 # =================================================================
