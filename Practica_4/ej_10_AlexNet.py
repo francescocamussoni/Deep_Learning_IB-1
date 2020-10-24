@@ -119,13 +119,12 @@ IDG = ImageDataGenerator(
 # or zca_whitening are set to True.
 # IDG.fit(x_train)
 
-# hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
-hist = model.fit_generator(IDG.flow(x_train, y_train, batch_size=batch_size),
-                           epochs=epochs,
-                           steps_per_epoch=len(x_train) / batch_size,
-                           validation_data=(x_val, y_val),
-                           validation_batch_size=batch_size,
-                           verbose=2)
+hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
+                 epochs=epochs,
+                 steps_per_epoch=len(x_train) / batch_size,
+                 validation_data=(x_val, y_val),
+                 validation_batch_size=batch_size,
+                 verbose=2)
 
 # Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc = model.evaluate(x_test, y_test)
