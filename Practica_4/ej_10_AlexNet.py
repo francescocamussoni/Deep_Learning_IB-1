@@ -75,17 +75,17 @@ model = keras.models.Sequential(name='Mini-AlexNet')
 
 model.add(layers.Input(shape=(32, 32, 3)))
 
-model.add(layers.Conv2D(96, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf*0.1)))
+model.add(layers.Conv2D(96, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.MaxPool2D(3, strides=2))
 model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf*0.1)))
+model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.MaxPool2D(3, strides=2))
 model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(384, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf)))
+model.add(layers.Conv2D(384, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(384, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf)))
+model.add(layers.Conv2D(384, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf*0.1)))
+model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.Flatten())
 model.add(layers.Dropout(0.3))
 model.add(layers.BatchNormalization())
@@ -130,14 +130,14 @@ hist = model.fit_generator(IDG.flow(x_train, y_train, batch_size=batch_size),
 # Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc = model.evaluate(x_test, y_test)
 
-data_folder = os.path.join('Datos', '10_AlexNet' + dataset)
+data_folder = os.path.join('Datos', '10_AlexNet_' + dataset)
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 model.save(os.path.join(data_folder, '{}.h5'.format(description)))
 np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 # Guardo las imagenes
-img_folder = os.path.join('Figuras', '10_AlexNet' + dataset)
+img_folder = os.path.join('Figuras', '10_AlexNet_' + dataset)
 if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
@@ -165,59 +165,3 @@ plt.savefig(os.path.join(img_folder, 'Acc_{}.png'.format(description)),
             format="png",
             bbox_inches="tight")
 plt.close()
-
-# Layer (type)                 Output Shape              Param #
-# =================================================================
-# conv2d_31 (Conv2D)           (None, 55, 55, 96)        34944
-# _________________________________________________________________
-# max_pooling2d_16 (MaxPooling (None, 27, 27, 96)        0
-# _________________________________________________________________
-# conv2d_32 (Conv2D)           (None, 27, 27, 256)       614656
-# _________________________________________________________________
-# max_pooling2d_17 (MaxPooling (None, 13, 13, 256)       0
-# _________________________________________________________________
-# conv2d_33 (Conv2D)           (None, 13, 13, 384)       885120
-# _________________________________________________________________
-# conv2d_34 (Conv2D)           (None, 13, 13, 384)       1327488
-# _________________________________________________________________
-# conv2d_35 (Conv2D)           (None, 13, 13, 256)       884992
-# _________________________________________________________________
-# max_pooling2d_18 (MaxPooling (None, 6, 6, 256)         0
-# _________________________________________________________________
-# flatten (Flatten)            (None, 9216)              0
-# _________________________________________________________________
-# dense_1 (Dense)              (None, 4096)              37752832
-# _________________________________________________________________
-# dense_2 (Dense)              (None, 4096)              16781312
-# _________________________________________________________________
-# dense_3 (Dense)              (None, 1000)              4097000
-# =================================================================
-# Total params: 62,378,344
-# Trainable params: 62,378,344
-# Non-trainable params: 0
-# _________________________________________________________________
-
-# # Arquitectura de la AlexNet - Original
-# model = keras.models.Sequential(name='AlexNet')
-
-# model.add(layers.Input(shape=(227,227,3)))
-
-# model.add(layers.Conv2D(96,11,strides=4,activation='relu'))
-# model.add(layers.MaxPool2D(3,strides=2))
-
-# model.add(layers.Conv2D(256,5,strides=1,activation='relu',padding='same'))
-# model.add(layers.MaxPool2D(3,strides=2))
-
-# model.add(layers.Conv2D(384,3,strides=1,activation='relu',padding='same'))
-# model.add(layers.Conv2D(384,3,strides=1,activation='relu',padding='same'))
-# model.add(layers.Conv2D(256,3,strides=1,activation='relu',padding='same'))
-# model.add(layers.MaxPool2D(3,strides=2))
-
-# model.add(layers.Flatten())
-# model.add(layers.Dense(4096,activation='relu'))
-# model.add(layers.Dense(4096,activation='relu'))
-# model.add(layers.Dense(1000,activation='softmax'))
-
-# Ratio entre num. parametros y dim de entrada
-# 62,378,344 / (227*227*3) = 403.5
-# 403 * (32*32*3) = 1238016
