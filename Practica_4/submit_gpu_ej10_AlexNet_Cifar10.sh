@@ -19,6 +19,10 @@ source activate deep_learning
 hostname
 
 # Ejercicio 6, con dos capas de 20 neuronas
-python ej_10_AlexNet.py -lr 1e-3 -e 100 -bs 256 --dataset 'cifar10'
-python ej_10_AlexNet.py -lr 1e-4 -e 100 -bs 256 --dataset 'cifar10'
+python ej_10_AlexNet.py -lr 1e-3 -rf 3e-4 -e 100 -bs 64 --dataset 'cifar10'
+python ej_10_AlexNet.py -lr 1e-3 -rf 6e-4 -e 100 -bs 64 --dataset 'cifar10'
+python ej_10_AlexNet.py -lr 1e-3 -rf 1e-3 -e 100 -bs 64 --dataset 'cifar10'
 
+python ej_10_AlexNet.py -lr 1e-4 -rf 3e-4 -e 100 -bs 64 --dataset 'cifar10'
+python ej_10_AlexNet.py -lr 1e-4 -rf 6e-4 -e 100 -bs 64 --dataset 'cifar10'
+python ej_10_AlexNet.py -lr 1e-4 -rf 1e-3 -e 100 -bs 64 --dataset 'cifar10'
