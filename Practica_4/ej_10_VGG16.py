@@ -33,42 +33,42 @@ from tensorflow.keras.regularizers import l2
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-# # Importo los datos
-# if dataset == 'cifar10':
-#     (x_train, y_train), (x_test, y_test) = cifar10.load_data()
-#     n_classes = 10
-# elif dataset == 'cifar100':
-#     (x_train, y_train), (x_test, y_test) = cifar100.load_data()
-#     n_classes = 100
+# Importo los datos
+if dataset == 'cifar10':
+    (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+    n_classes = 10
+elif dataset == 'cifar100':
+    (x_train, y_train), (x_test, y_test) = cifar100.load_data()
+    n_classes = 100
 
-# # Los junto porque quiero splitearlos distinto
-# x_train, y_train = np.vstack((x_train, x_test)), np.vstack((y_train, y_test))
-# # Separo los datos de test
-# x_train, x_test, y_train, y_test = train_test_split(x_train,
-#                                                     y_train,
-#                                                     test_size=9000,
-#                                                     stratify=y_train)
-# # Ahora separo entre training y validacion
-# x_train, x_val, y_train, y_val = train_test_split(x_train,
-#                                                   y_train,
-#                                                   test_size=9000,
-#                                                   stratify=y_train)
+# Los junto porque quiero splitearlos distinto
+x_train, y_train = np.vstack((x_train, x_test)), np.vstack((y_train, y_test))
+# Separo los datos de test
+x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=9000,
+                                                    stratify=y_train)
+# Ahora separo entre training y validacion
+x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                  y_train,
+                                                  test_size=9000,
+                                                  stratify=y_train)
 
-# # Normalizacion
-# media = x_train.mean(axis=0)
-# sigma = x_train.std(axis=0)
+# Normalizacion
+media = x_train.mean(axis=0)
+sigma = x_train.std(axis=0)
 
-# x_train = x_train - media
-# x_train /= sigma
-# x_test = x_test - media
-# x_test /= sigma
-# x_val = x_val - media
-# x_val /= sigma
+x_train = x_train - media
+x_train /= sigma
+x_test = x_test - media
+x_test /= sigma
+x_val = x_val - media
+x_val /= sigma
 
-# # Paso los labels a one-hot encoded
-# y_train = keras.utils.to_categorical(y_train, n_classes)
-# y_test = keras.utils.to_categorical(y_test, n_classes)
-# y_val = keras.utils.to_categorical(y_val, n_classes)
+# Paso los labels a one-hot encoded
+y_train = keras.utils.to_categorical(y_train, n_classes)
+y_test = keras.utils.to_categorical(y_test, n_classes)
+y_val = keras.utils.to_categorical(y_val, n_classes)
 
 # Arquitectura de la mini-AlexNet
 model = keras.models.Sequential(name='Mini-VGG16')
@@ -119,7 +119,7 @@ model.add(layers.MaxPool2D(3, strides=1))
 model.add(layers.Flatten())
 model.add(layers.Dropout(0.3))
 model.add(layers.BatchNormalization())
-model.add(layers.Dense(6272, activation='relu', kernel_regularizer=l2(rf)))
+model.add(layers.Dense(2048, activation='relu', kernel_regularizer=l2(rf)))
 model.add(layers.Dropout(0.3))
 model.add(layers.BatchNormalization())
 model.add(layers.Dense(1024, activation='relu', kernel_regularizer=l2(rf)))
