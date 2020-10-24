@@ -30,14 +30,17 @@ from tensorflow.keras.regularizers import l2
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 # Los junto porque creo que no estan bien distribuidos
-x, y = np.vstack((x_train, x_test)), np.hstack((y_train, y_test))
+x_train, y_train = np.vstack((x_train, x_test)), np.hstack((y_train, y_test))
 # Separo los datos de test
-x, x_test, y, y_test = train_test_split(x, y, test_size=1 / 7, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=1 / 7,
+                                                    stratify=y_train)
 # Ahora separo entre training y validacion
-x_train, x_val, y_train, y_val = train_test_split(x,
-                                                  y,
+x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                  y_train,
                                                   test_size=1 / 6,
-                                                  stratify=y)
+                                                  stratify=y_train)
 
 # Normalizacion
 media = x_train.mean(axis=0)

@@ -30,19 +30,21 @@ dim = 10000
 (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=dim)
 
 # Muchos datos de test, prefiero dividirlo en proporciones distintas
-x, y = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
+x_train, y_train = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
 # Hacemos el padding ahora que estan todos los datos juntos
-x = keras.preprocessing.sequence.pad_sequences(x,
-                                               padding='post',
-                                               dtype=np.float)
+x_train = keras.preprocessing.sequence.pad_sequences(x_train,
+                                                     padding='post',
+                                                     dtype=np.float)
 # Separo los datos de test
-x, x_test, y, y_test = train_test_split(x, y, test_size=0.2, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=0.2,
+                                                    stratify=y_train)
 # Ahora separo entre training y validacion
-x_train, x_val, y_train, y_val = train_test_split(x,
-                                                  y,
+x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                  y_train,
                                                   test_size=0.25,
-                                                  stratify=y)
-
+                                                  stratify=y_train)
 
 # Arquitectura con dropout
 model = keras.models.Sequential(name='Ejercicio_4_Embedding')

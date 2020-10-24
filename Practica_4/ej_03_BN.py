@@ -30,14 +30,14 @@ dim = 10000
 (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=dim)
 
 # Muchos datos de test, prefiero dividirlo en proporciones distintas
-x, y = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
+x_train, y_train = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
 # Separo los datos de test
-x, x_test, y, y_test = train_test_split(x, y, test_size=0.2, stratify=y)
-# Ahora separo entre training y validacion
-x_train, x_val, y_train, y_val = train_test_split(x,
-                                                  y,
+x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size=0.2, stratify=y_train)
+# Ahora separa entre training y validacion
+x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                  y_train,
                                                   test_size=0.25,
-                                                  stratify=y)
+                                                  stratify=y_train)
 
 # Esto no hace falta, era para pasar a texto la reseña
 indexes = imdb.get_word_index()
@@ -54,15 +54,15 @@ def vectorizeWCounts(x, dim):
 
 
 # Vectorizo los datos
-x_train_v = vectorizeWCounts(x_train, dim)
-x_test_v = vectorizeWCounts(x_test, dim)
-x_val_v = vectorizeWCounts(x_val, dim)
+x_train = vectorizeWCounts(x_train, dim)
+x_test = vectorizeWCounts(x_test, dim)
+x_val = vectorizeWCounts(x_val, dim)
 y_train = y_train.astype(np.float)
 y_test = y_test.astype(np.float)
 y_val = y_val.astype(np.float)
 
 # Arquitectura con dropout
-inputs = layers.Input(shape=(x_train_v.shape[1], ), name="Input")
+inputs = layers.Input(shape=(x_train.shape[1], ), name="Input")
 
 l1 = layers.Dense(nn, activation=activations.relu, name="Hidden_1")(inputs)
 
@@ -85,15 +85,15 @@ model.compile(optimizer=optimizers.Adam(learning_rate=lr),
 model.summary()
 
 # Entreno
-hist = model.fit(x_train_v,
+hist = model.fit(x_train,
                  y_train,
-                 validation_data=(x_val_v, y_val),
+                 validation_data=(x_val, y_val),
                  epochs=epochs,
                  batch_size=batch_size,
                  verbose=2)
 
 # Calculo la loss y Accuracy para los datos de test
-test_loss, test_Acc = model.evaluate(x_test_v, y_test)
+test_loss, test_Acc = model.evaluate(x_test, y_test)
 
 # Guardo los datos
 data_folder = os.path.join('Datos', '3_BN')

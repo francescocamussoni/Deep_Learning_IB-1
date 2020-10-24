@@ -32,12 +32,12 @@ dim = 10000
 # Muchos datos de test, prefiero dividirlo en proporciones distintas
 x_train, y_train = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
 # Separo los datos de test
-x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size=0.2, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size=0.2, stratify=y_train)
 # Ahora separa entre training y validacion
 x_train, x_val, y_train, y_val = train_test_split(x_train,
                                                   y_train,
                                                   test_size=0.25,
-                                                  stratify=y)
+                                                  stratify=y_train)
 
 # Esto no hace falta, era para pasar a texto la reseña
 indexes = imdb.get_word_index()
