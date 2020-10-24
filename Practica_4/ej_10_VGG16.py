@@ -162,14 +162,14 @@ hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
 # Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc = model.evaluate(x_test, y_test)
 
-data_folder = os.path.join('Datos', '10_AlexNet_' + dataset)
+data_folder = os.path.join('Datos', '10_VGG16_' + dataset)
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 model.save(os.path.join(data_folder, '{}.h5'.format(description)))
 np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 # Guardo las imagenes
-img_folder = os.path.join('Figuras', '10_AlexNet_' + dataset)
+img_folder = os.path.join('Figuras', '10_VGG16_' + dataset)
 if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
