@@ -19,7 +19,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
-from CLArg import lr, epochs, batch_size, description
+from CLArg import lr, rf, epochs, batch_size, description
 from CLArg import dataset
 
 from sklearn.model_selection import train_test_split
@@ -75,30 +75,24 @@ model = keras.models.Sequential(name='Mini-AlexNet')
 
 model.add(layers.Input(shape=(32, 32, 3)))
 
-model.add(layers.Conv2D(96, 5, strides=2, activation='relu', padding='valid'))
-# model.add(layers.Conv2D(32,5,strides=2,activation='relu',padding='same'))
-model.add(layers.MaxPool2D(3, strides=1))
-# model.add(layers.MaxPool2D(2,strides=1))
-
-# model.add(layers.Conv2D(192,5,strides=1,activation='relu',padding='same'))
-model.add(layers.Conv2D(192, 5, strides=1, activation='relu', padding='valid'))
-model.add(layers.MaxPool2D(3, strides=1))
-
-model.add(layers.Dropout(0.25))
+model.add(layers.Conv2D(96, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf*0.1)))
+model.add(layers.MaxPool2D(3, strides=2))
 model.add(layers.BatchNormalization())
-
-model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
-model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
-model.add(layers.Conv2D(192, 3, strides=1, activation='relu', padding='same'))
-model.add(layers.MaxPool2D(3, strides=1))
-
+model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf*0.1)))
+model.add(layers.MaxPool2D(3, strides=2))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(384, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf)))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(384, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf)))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same', kernel_regularizer=l2(rf*0.1)))
 model.add(layers.Flatten())
-
-model.add(layers.Dropout(0.5))
+model.add(layers.Dropout(0.3))
 model.add(layers.BatchNormalization())
-
-model.add(layers.Dense(512, activation='relu'))
-model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(1024, activation='relu', kernel_regularizer=l2(rf)))
+model.add(layers.Dropout(0.3))
+model.add(layers.BatchNormalization())
+model.add(layers.Dense(1024, activation='relu', kernel_regularizer=l2(rf)))
 model.add(layers.Dense(n_classes, activation='linear'))
 
 model.summary()
