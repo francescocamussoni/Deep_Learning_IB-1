@@ -102,18 +102,15 @@ model.compile(optimizer=optimizers.Adam(learning_rate=lr),
               metrics=[metrics.CategoricalAccuracy(name='CAcc')])
 
 IDG = ImageDataGenerator(
-    # Ang max de rotaciones
-    rotation_range=30,
-    # Cant de pixeles que puede trasladarse, sepuede pasar una
-    # fraccion de la dimension en vez de un entero
-    width_shift_range=5,
-    height_shift_range=5,
-    brightness_range=[0.5, 1.5],  # Cuanto puede variar el brillo
-    shear_range=0.,  # No entendi que es
-    zoom_range=0.,  # Por lo que vi, queda re feo asi que no lo uso
-    fill_mode='nearest',  # Estrategia para llenar los huecos
-    horizontal_flip=True,  # Reflexion horizontal b -> d
-    vertical_flip=True,  # Reflexion vertical ! -> ¡
+    rotation_range=45,  # Ang max de rotaciones
+    width_shift_range=5,    # Cant de pixeles que puede trasladarse, sepuede pasar una
+    height_shift_range=5,   # fraccion de la dimension en vez de un entero
+    # brightness_range=[0.5, 1.5],  # Cuanto puede variar el brillo, si lo uso todo da mal
+    shear_range=0.,     # No entendi que es
+    zoom_range=0.,      # Por lo que vi, queda re feo asi que no lo uso
+    fill_mode='nearest',    # Estrategia para llenar los huecos
+    horizontal_flip=True,   # Reflexion horizontal b -> d
+    vertical_flip=False,    # Reflexion vertical   ! -> ¡
     # Con esto alcanza creo, el resto no tengo tan claro como funciona
     # y prefiero dejarlo asi
 )
@@ -124,11 +121,11 @@ IDG = ImageDataGenerator(
 
 # hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
 hist = model.fit_generator(IDG.flow(x_train, y_train, batch_size=batch_size),
-                 epochs=epochs,
-                 steps_per_epoch=len(x_train) / batch_size,
-                 validation_data=(x_val, y_val),
-                #  workers=4,
-                 verbose=2)
+                           epochs=epochs,
+                           steps_per_epoch=len(x_train) / batch_size,
+                           validation_data=(x_val, y_val),
+                           validation_batch_size=batch_size,
+                           verbose=2)
 
 # Calculo la loss y Accuracy para los datos de test
 test_loss, test_Acc = model.evaluate(x_test, y_test)
