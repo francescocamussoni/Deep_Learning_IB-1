@@ -21,11 +21,13 @@ from tensorflow.keras.datasets import imdb
 
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, activations, regularizers
 from tensorflow.keras import losses, metrics, optimizers
+from tensorflow.keras.regularizers import l2
 
 import seaborn as snn
 snn.set(font_scale=1)
@@ -1075,8 +1077,8 @@ def ejercicio_6(nn,correccion=False, masCapas=False):
 
 def ejercicio_7():
     lr = 1e-3
-    epochs = 500
-    batch_size = 32
+    epochs = 200
+    batch_size = 512
     description = "lr={}_bs={}".format(lr, batch_size)
 
     # Importo los datos
@@ -1196,8 +1198,8 @@ def ejercicio_7():
 
 def ejercicio_7_v2():
     lr = 1e-3
-    epochs = 500
-    batch_size = 32
+    epochs = 200
+    batch_size = 512
     description = "lr={}_bs={}".format(lr, batch_size)
 
     # Importo los datos
@@ -1315,14 +1317,608 @@ def ejercicio_7_v2():
 #           Ejercicio 8
 #--------------------------------------
 
+def ejercicio_8_Densa():
+    lr = 1e-3
+    rf = 1e-3
+    epochs = 100
+    batch_size = 512
+    drop_arg = 0.2
+    description = "lr={}_bs={}".format(lr, batch_size)
+
+    # Importo los datos
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+    # Los junto porque creo que no estan bien distribuidos
+    x_train, y_train = np.vstack((x_train, x_test)), np.hstack((y_train, y_test))
+    # Separo los datos de test
+    x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                        y_train,
+                                                        test_size=1 / 7,
+                                                        stratify=y_train)
+    # Ahora separo entre training y validacion
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=1 / 6,
+                                                    stratify=y_train)
+
+    # Normalizacion
+    media = x_train.mean(axis=0)
+
+    x_train = x_train - media
+    x_train = x_train / 255
+    x_test = x_test - media
+    x_test = x_test / 255
+    x_val = x_val - media
+    x_val = x_val / 255
+
+    # Paso los labels a one-hot representation
+    y_train = keras.utils.to_categorical(y_train, 10)
+    y_test = keras.utils.to_categorical(y_test, 10)
+    y_val = keras.utils.to_categorical(y_val, 10)
+
+    # Arquitectura de la red con capas densas
+    model = keras.models.Sequential(name='MNIST_Dense')
+
+    model.add(layers.Flatten(input_shape=x_train.shape[1:]))
+    model.add(layers.Dense(250, 'relu', kernel_regularizer=l2(rf)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.Dense(50, 'relu', kernel_regularizer=l2(rf)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.Dense(10, 'linear', kernel_regularizer=l2(rf)))
+
+    model.summary()
+
+    model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+                loss=losses.CategoricalCrossentropy(from_logits=True),
+                metrics=[metrics.CategoricalAccuracy(name='CAcc')])
+
+    hist = model.fit(x_train,
+                    y_train,
+                    epochs=epochs,
+                    validation_data=(x_val, y_val),
+                    batch_size=batch_size,
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '8_Dense')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
+def ejercicio_8_Conv():
+    lr = 1e-3
+    rf = 1e-3
+    epochs = 100
+    batch_size = 512
+    drop_arg = 0.2
+    description = "lr={}_bs={}".format(lr, batch_size)
+    # Importo los datos
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+    # Los junto porque creo que no estan bien distribuidos
+    x_train, y_train = np.vstack((x_train, x_test)), np.hstack((y_train, y_test))
+    # Separo los datos de test
+    x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                        y_train,
+                                                        test_size=1 / 7,
+                                                        stratify=y_train)
+    # Ahora separo entre training y validacion
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=1 / 6,
+                                                    stratify=y_train)
+
+    # Normalizacion
+    media = x_train.mean(axis=0)
+
+    x_train = x_train - media
+    x_train = x_train.reshape((-1, 28, 28, 1)) / 255
+    x_test = x_test - media
+    x_test = x_test.reshape((-1, 28, 28, 1)) / 255
+    x_val = x_val - media
+    x_val = x_val.reshape((-1, 28, 28, 1)) / 255
+
+    # Paso los labels a one-hot representation
+    y_train = keras.utils.to_categorical(y_train, 10)
+    y_test = keras.utils.to_categorical(y_test, 10)
+    y_val = keras.utils.to_categorical(y_val, 10)
+
+    # Arquitectura de la red con capas densas
+    model = keras.models.Sequential(name='MNIST_Conv')
+    model.add(layers.Input(shape=x_train.shape[1:]))
+
+    model.add(layers.Conv2D(32, 3, activation='relu'))
+    model.add(layers.MaxPool2D())
+    model.add(layers.Conv2D(64, 3, activation='relu'))
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.Conv2D(64, 3, activation='relu'))
+    model.add(layers.MaxPool2D())
+    model.add(layers.Flatten())
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.Dense(10, 'linear', kernel_regularizer=l2(rf)))
+
+    model.summary()
+
+    model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+                loss=losses.CategoricalCrossentropy(from_logits=True),
+                metrics=[metrics.CategoricalAccuracy(name='CAcc')])
+
+    hist = model.fit(x_train,
+                    y_train,
+                    epochs=epochs,
+                    validation_data=(x_val, y_val),
+                    batch_size=batch_size,
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '8_Conv')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
 #--------------------------------------
 #           Ejercicio 9
 #--------------------------------------
+
+def ejercicio_9_Densa():
+    lr = 1e-3
+    rf = 1e-3
+    epochs = 100
+    batch_size = 512
+    drop_arg = 0.2
+    description = "lr={}_bs={}".format(lr, batch_size)
+
+    # Importo los datos
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+    # Los junto porque creo que no estan bien distribuidos
+    x_train, y_train = np.vstack((x_train, x_test)), np.hstack((y_train, y_test))
+    # Separo los datos de test
+    x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                        y_train,
+                                                        test_size=1 / 7,
+                                                        stratify=y_train)
+    # Ahora separo entre training y validacion
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=1 / 6,
+                                                    stratify=y_train)
+
+    # Normalizacion
+    media = x_train.mean(axis=0)
+
+    x_train = x_train - media
+    x_train = x_train / 255
+    x_test = x_test - media
+    x_test = x_test / 255
+    x_val = x_val - media
+    x_val = x_val / 255
+
+    # Paso los labels a one-hot representation
+    y_train = keras.utils.to_categorical(y_train, 10)
+    y_test = keras.utils.to_categorical(y_test, 10)
+    y_val = keras.utils.to_categorical(y_val, 10)
+
+    # Permuto los datos para el ejercicio 9
+    permutation = np.random.permutation(28*28)
+
+    x_train_perm = x_train.reshape(x_train.shape[0], -1)
+    x_train_perm = x_train_perm[:,permutation]
+    x_train_perm = x_train_perm.reshape(x_train.shape)
+
+    x_test_perm = x_test.reshape(x_test.shape[0], -1)
+    x_test_perm = x_test_perm[:,permutation]
+    x_test_perm = x_test_perm.reshape(x_test.shape)
+
+    x_val_perm = x_val.reshape(x_val.shape[0], -1)
+    x_val_perm = x_val_perm[:,permutation]
+    x_val_perm = x_val_perm.reshape(x_val.shape)
+
+    # Renombro asi no tengo que cambiar el resto del codigo
+    x_train = x_train_perm
+    x_test = x_test_perm
+    x_val = x_val_perm
+
+    # Arquitectura de la red con capas densas
+    model = keras.models.Sequential(name='MNIST_Dense')
+
+    model.add(layers.Flatten(input_shape=x_train.shape[1:]))
+    model.add(layers.Dense(250, 'relu', kernel_regularizer=l2(rf)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.Dense(50, 'relu', kernel_regularizer=l2(rf)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.Dense(10, 'linear', kernel_regularizer=l2(rf)))
+
+    model.summary()
+
+    model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+                loss=losses.CategoricalCrossentropy(from_logits=True),
+                metrics=[metrics.CategoricalAccuracy(name='CAcc')])
+
+    hist = model.fit(x_train,
+                    y_train,
+                    epochs=epochs,
+                    validation_data=(x_val, y_val),
+                    batch_size=batch_size,
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '9_Dense')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
+def ejercicio_9_Conv():
+    lr = 1e-3
+    rf = 1e-3
+    epochs = 100
+    batch_size = 512
+    drop_arg = 0.2
+    description = "lr={}_bs={}".format(lr, batch_size)
+
+    # Importo los datos
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+    # Los junto porque creo que no estan bien distribuidos
+    x_train, y_train = np.vstack((x_train, x_test)), np.hstack((y_train, y_test))
+    # Separo los datos de test
+    x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                        y_train,
+                                                        test_size=1 / 7,
+                                                        stratify=y_train)
+    # Ahora separo entre training y validacion
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=1 / 6,
+                                                    stratify=y_train)
+
+    # Normalizacion
+    media = x_train.mean(axis=0)
+
+    x_train = x_train - media
+    x_train = x_train.reshape((-1, 28, 28, 1)) / 255
+    x_test = x_test - media
+    x_test = x_test.reshape((-1, 28, 28, 1)) / 255
+    x_val = x_val - media
+    x_val = x_val.reshape((-1, 28, 28, 1)) / 255
+
+    # Paso los labels a one-hot representation
+    y_train = keras.utils.to_categorical(y_train, 10)
+    y_test = keras.utils.to_categorical(y_test, 10)
+    y_val = keras.utils.to_categorical(y_val, 10)
+
+    # Permuto los datos para el ejercicio 9
+    permutation = np.random.permutation(28*28)
+
+    x_train_perm = x_train.reshape(x_train.shape[0], -1)
+    x_train_perm = x_train_perm[:,permutation]
+    x_train_perm = x_train_perm.reshape(x_train.shape)
+
+    x_test_perm = x_test.reshape(x_test.shape[0], -1)
+    x_test_perm = x_test_perm[:,permutation]
+    x_test_perm = x_test_perm.reshape(x_test.shape)
+
+    x_val_perm = x_val.reshape(x_val.shape[0], -1)
+    x_val_perm = x_val_perm[:,permutation]
+    x_val_perm = x_val_perm.reshape(x_val.shape)
+
+    # Renombro asi no tengo que cambiar el resto del codigo
+    x_train = x_train_perm
+    x_test = x_test_perm
+    x_val = x_val_perm
+
+    # Arquitectura de la red con capas densas
+    model = keras.models.Sequential(name='MNIST_Conv')
+    model.add(layers.Input(shape=x_train.shape[1:]))
+
+    model.add(layers.Conv2D(32, 3, activation='relu'))
+    model.add(layers.MaxPool2D())
+    model.add(layers.Conv2D(64, 3, activation='relu'))
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.Conv2D(64, 3, activation='relu'))
+    model.add(layers.MaxPool2D())
+    model.add(layers.Flatten())
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.Dense(10, 'linear', kernel_regularizer=l2(rf)))
+
+    model.summary()
+
+    model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+                loss=losses.CategoricalCrossentropy(from_logits=True),
+                metrics=[metrics.CategoricalAccuracy(name='CAcc')])
+
+    hist = model.fit(x_train,
+                    y_train,
+                    epochs=epochs,
+                    validation_data=(x_val, y_val),
+                    batch_size=batch_size,
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '9_Conv')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 #--------------------------------------
 #           Ejercicio 10
 #--------------------------------------
 
+def ejercicio_10_AlexNet(dataset='cifar10'):
+    lr = 1e-3
+    rf = 1e-4
+    epochs = 100
+    batch_size = 256
+    drop_arg = 0.2
+    description = "lr={}_bs={}".format(lr, batch_size)
+
+    # Importo los datos
+    if dataset == 'cifar10':
+        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+        n_classes = 10
+    elif dataset == 'cifar100':
+        (x_train, y_train), (x_test, y_test) = cifar100.load_data()
+        n_classes = 100
+
+    # Los junto porque quiero splitearlos distinto
+    x_train, y_train = np.vstack((x_train, x_test)), np.vstack((y_train, y_test))
+    # Separo los datos de test
+    x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                        y_train,
+                                                        test_size=9000,
+                                                        stratify=y_train)
+    # Ahora separo entre training y validacion
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=9000,
+                                                    stratify=y_train)
+
+    # Normalizacion
+    media = x_train.mean(axis=0)
+    sigma = x_train.std(axis=0)
+
+    x_train = x_train - media
+    x_train /= sigma
+    x_test = x_test - media
+    x_test /= sigma
+    x_val = x_val - media
+    x_val /= sigma
+
+    # Paso los labels a one-hot encoded
+    y_train = keras.utils.to_categorical(y_train, n_classes)
+    y_test = keras.utils.to_categorical(y_test, n_classes)
+    y_val = keras.utils.to_categorical(y_val, n_classes)
+
+    # Arquitectura de la mini-AlexNet
+    model = keras.models.Sequential(name='Mini-AlexNet')
+
+    model.add(layers.Input(shape=(32, 32, 3)))
+
+    model.add(layers.Conv2D(96, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.MaxPool2D(3, strides=2))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.MaxPool2D(3, strides=2))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(384, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(384, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.Flatten())
+    model.add(layers.Dropout(0.3))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dense(1024, activation='relu', kernel_regularizer=l2(rf)))
+    model.add(layers.Dropout(0.3))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dense(1024, activation='relu', kernel_regularizer=l2(rf)))
+    model.add(layers.Dense(n_classes, activation='linear'))
+
+    model.summary()
+
+    model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+                loss=losses.CategoricalCrossentropy(from_logits=True),
+                metrics=[metrics.CategoricalAccuracy(name='CAcc')])
+
+    IDG = ImageDataGenerator(
+        rotation_range=45,  # Ang max de rotaciones
+        width_shift_range=5,    # Cant de pixeles que puede trasladarse, sepuede pasar una
+        height_shift_range=5,   # fraccion de la dimension en vez de un entero
+        # brightness_range=[0.5, 1.5],  # Cuanto puede variar el brillo, si lo uso todo da mal
+        shear_range=0.,     # No entendi que es
+        zoom_range=0.,      # Por lo que vi, queda re feo asi que no lo uso
+        fill_mode='nearest',    # Estrategia para llenar los huecos
+        horizontal_flip=True,   # Reflexion horizontal b -> d
+        vertical_flip=False,    # Reflexion vertical   ! -> ¡
+        # Con esto alcanza creo, el resto no tengo tan claro como funciona
+        # y prefiero dejarlo asi
+    )
+
+    # Only required if featurewise_center or featurewise_std_normalization
+    # or zca_whitening are set to True.
+    # IDG.fit(x_train)
+
+    hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
+                    epochs=epochs,
+                    steps_per_epoch=len(x_train) / batch_size,
+                    validation_data=(x_val, y_val),
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    data_folder = os.path.join('Datos', '10_AlexNet_' + dataset)
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
+
+def ejercicio_10_VGG16(dataset='cifar10'):
+    lr = 1e-3
+    rf = 1e-4
+    epochs = 100
+    batch_size = 256
+    drop_arg = 0.2
+    description = "lr={}_bs={}".format(lr, batch_size)
+
+    # Importo los datos
+    if dataset == 'cifar10':
+        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+        n_classes = 10
+    elif dataset == 'cifar100':
+        (x_train, y_train), (x_test, y_test) = cifar100.load_data()
+        n_classes = 100
+
+    # Los junto porque quiero splitearlos distinto
+    x_train, y_train = np.vstack((x_train, x_test)), np.vstack((y_train, y_test))
+    # Separo los datos de test
+    x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                        y_train,
+                                                        test_size=9000,
+                                                        stratify=y_train)
+    # Ahora separo entre training y validacion
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=9000,
+                                                    stratify=y_train)
+
+    # Normalizacion
+    media = x_train.mean(axis=0)
+    sigma = x_train.std(axis=0)
+
+    x_train = x_train - media
+    x_train /= sigma
+    x_test = x_test - media
+    x_test /= sigma
+    x_val = x_val - media
+    x_val /= sigma
+
+    # Paso los labels a one-hot encoded
+    y_train = keras.utils.to_categorical(y_train, n_classes)
+    y_test = keras.utils.to_categorical(y_test, n_classes)
+    y_val = keras.utils.to_categorical(y_val, n_classes)
+
+    # Arquitectura de la mini-AlexNet
+    model = keras.models.Sequential(name='Mini-VGG16')
+
+    model.add(layers.Input(shape=(32, 32, 3)))
+
+    model.add(layers.Conv2D(64, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(64, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.MaxPool2D(2, strides=2))
+
+    model.add(layers.Conv2D(128, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(128, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.MaxPool2D(2, strides=2))
+
+    model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.MaxPool2D(2, strides=1))
+
+    model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.MaxPool2D(2, strides=1))
+
+    model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.MaxPool2D(2, strides=1))
+
+    model.add(layers.Flatten())
+    model.add(layers.Dropout(0.3))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dense(1024, activation='relu', kernel_regularizer=l2(rf)))
+    model.add(layers.Dropout(0.3))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dense(512, activation='relu', kernel_regularizer=l2(rf)))
+    model.add(layers.Dropout(0.3))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Dense(512, activation='relu', kernel_regularizer=l2(rf)))
+    model.add(layers.Dense(n_classes, activation='linear'))
+
+
+    model.summary()
+
+    model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+                loss=losses.CategoricalCrossentropy(from_logits=True),
+                metrics=[metrics.CategoricalAccuracy(name='CAcc')])
+
+    IDG = ImageDataGenerator(
+        rotation_range=45,  # Ang max de rotaciones
+        width_shift_range=5,    # Cant de pixeles que puede trasladarse, sepuede pasar una
+        height_shift_range=5,   # fraccion de la dimension en vez de un entero
+        # brightness_range=[0.5, 1.5],  # Cuanto puede variar el brillo, si lo uso todo da mal
+        shear_range=0.,     # No entendi que es
+        zoom_range=0.,      # Por lo que vi, queda re feo asi que no lo uso
+        fill_mode='nearest',    # Estrategia para llenar los huecos
+        horizontal_flip=True,   # Reflexion horizontal b -> d
+        vertical_flip=False,    # Reflexion vertical   ! -> ¡
+        # Con esto alcanza creo, el resto no tengo tan claro como funciona
+        # y prefiero dejarlo asi
+    )
+
+    # Only required if featurewise_center or featurewise_std_normalization
+    # or zca_whitening are set to True.
+    # IDG.fit(x_train)
+
+    hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
+                    epochs=epochs,
+                    steps_per_epoch=len(x_train) / batch_size,
+                    validation_data=(x_val, y_val),
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    data_folder = os.path.join('Datos', '10_VGG16_' + dataset)
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+    
 #--------------------------------------
 #   Funciones para hacer los graficos
 #--------------------------------------
@@ -2256,61 +2852,69 @@ def graficos_10_VGG_Cifar100():
 
 if __name__ == "__main__":
 
-    # ejercicio_1()
+    ejercicio_1()
 
     # ejercicio_2_EJ3TP2()
     # ejercicio_2_EJ4TP2()
     # ejercicio_2_XOR_A()
     # ejercicio_2_XOR_B()
 
-    # graficos_2_EJ3TP2()
-    # graficos_2_EJ4TP2()
-    # graficos_2_XOR()
+    graficos_2_EJ3TP2()
+    graficos_2_EJ4TP2()
+    graficos_2_XOR()
 
     # ejercicio_3_BN()
     # ejercicio_3_Dropout()
     # ejercicio_3_L2()
 
-    # graficos_3_BN()
-    # graficos_3_Dropout()
-    # graficos_3_L2()
+    graficos_3_BN()
+    graficos_3_Dropout()
+    graficos_3_L2()
 
     # ejercicio_4_Embedding()
     # ejercicio_4_Conv()
 
-    # graficos_4_Embedding()
-    # graficos_4_Conv()
+    graficos_4_Embedding()
+    graficos_4_Conv()
 
     # ejercicio_5()
-    # graficos_5()
+    graficos_5()
 
     # ejercicio_6(20)
     # ejercicio_6(40)
     # ejercicio_6(20,correccion=True)
     # ejercicio_6(20,masCapas=True)
 
-    # graficos_6()
-    # graficos_6_40N()
-    # graficos_6_CCorreccion()
+    graficos_6()
+    graficos_6_40N()
+    graficos_6_CCorreccion()
 
-    # ejercicio_7()
-    # ejercicio_7_v2()
+    ejercicio_7()
+    ejercicio_7_v2()
 
-    # graficos_7()
-    # graficos_7_v2()
+    graficos_7()
+    graficos_7_v2()
 
-    # graficos_8_Densa()
+    # ejercicio_8_Densa()
+    # ejercicio_8_Conv()
 
-    # graficos_8_Conv()
+    graficos_8_Densa()
+    graficos_8_Conv()
 
-    # graficos_9_Densa()
+    # ejercicio_9_Densa()
+    # ejercicio_9_Conv()
+    
+    graficos_9_Densa()
+    graficos_9_Conv()
 
-    # graficos_9_Conv()
+    # ejercicio_10_AlexNet('cifar10')
+    # ejercicio_10_AlexNet('cifar100')
 
-    # graficos_10_AlexNet_Cifar10()
+    graficos_10_AlexNet_Cifar10()
+    graficos_10_AlexNet_Cifar100()
 
-    # graficos_10_AlexNet_Cifar100()
+    # ejercicio_10_VGG16('cifar10')
+    # ejercicio_10_VGG16('cifar100')
 
-    # graficos_10_VGG_Cifar10()
-
-    # graficos_10_VGG_Cifar100()
+    graficos_10_VGG_Cifar10()
+    graficos_10_VGG_Cifar100()
