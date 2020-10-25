@@ -17,6 +17,14 @@ from matplotlib import pyplot as plt
 from sklearn.datasets import load_boston
 from tensorflow import keras
 
+import matplotlib as mpl
+mpl.rcParams.update({
+	'font.size': 20,
+	'figure.figsize': [8, 6],
+	'figure.autolayout': True,
+	'font.family': 'serif',
+	'font.sans-serif': ['Palatino']})
+
 boston = load_boston()
 # print(boston.DESCR) # Para printear la descripcion del dataset
 
@@ -74,33 +82,33 @@ if not os.path.exists(img_folder):
 
 plt.plot(y_test, y_pred, "ob", label="Predicciones")
 plt.plot(y_test, y_test, "k", label="Target")
-plt.xlabel("Precios reales [k$]", fontsize=15)
-plt.ylabel("Precios predichos [k$]", fontsize=15)
+plt.xlabel("Precios reales [k$]")
+plt.ylabel("Precios predichos [k$]")
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(img_folder, '1.png'),
-            format="png",
+plt.savefig(os.path.join(img_folder, '1.pdf'),
+            format="pdf",
             bbox_inches="tight")
 plt.close()
 
 plt.plot(history.history['loss'], label="Loss Training")
 plt.plot(history.history['val_loss'], label="Loss Test")
-plt.xlabel("Epocas", fontsize=15)
-plt.ylabel("Loss", fontsize=15)
+plt.xlabel("Epocas")
+plt.ylabel("Loss")
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(img_folder, '1_Loss.png'),
-            format="png",
+plt.savefig(os.path.join(img_folder, '1_Loss.pdf'),
+            format="pdf",
             bbox_inches="tight")
 plt.close()
 
 plt.plot(history.history['mse'], label="Acc. Training")
 plt.plot(history.history['val_mse'], label="Acc. Test")
-plt.xlabel("Epocas", fontsize=15)
-plt.ylabel("Accuracy", fontsize=15)
+plt.xlabel("Epocas")
+plt.ylabel("Accuracy")
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(img_folder, '1_Acc.png'),
-            format="png",
+plt.savefig(os.path.join(img_folder, '1_Acc.pdf'),
+            format="pdf",
             bbox_inches="tight")
 plt.close()

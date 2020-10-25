@@ -13,6 +13,13 @@ Description:
 import os
 import numpy as np
 from matplotlib import pyplot as plt
+import matplotlib as mpl
+mpl.rcParams.update({
+	'font.size': 20,
+	'figure.figsize': [8, 6],
+	'figure.autolayout': True,
+	'font.family': 'serif',
+	'font.sans-serif': ['Palatino']})
 
 # Script propio para pasar argumentos por linea de comandos
 from CLArg import lr, rf, epochs, batch_size, description
@@ -104,8 +111,8 @@ if not os.path.exists(img_folder):
 plt.plot(hist.history['loss'], label="Loss Training")
 plt.plot(hist.history['val_loss'], label="Loss Validation")
 plt.title("Acc Test: {:.3f}".format(test_Acc))
-plt.xlabel("Epocas", fontsize=15)
-plt.ylabel("Loss", fontsize=15)
+plt.xlabel("Epocas")
+plt.ylabel("Loss")
 plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
@@ -116,8 +123,8 @@ plt.close()
 plt.plot(hist.history['Acc'], label="Acc. Training")
 plt.plot(hist.history['val_Acc'], label="Acc. Validation")
 plt.title("Acc Test: {:.3f}".format(test_Acc))
-plt.xlabel("Epocas", fontsize=15)
-plt.ylabel("Accuracy", fontsize=15)
+plt.xlabel("Epocas")
+plt.ylabel("Accuracy")
 plt.legend(loc='best')
 plt.tight_layout()
 plt.savefig(os.path.join(img_folder, 'Acc_{}.png'.format(description)),
