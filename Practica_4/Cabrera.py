@@ -13,11 +13,406 @@ Description:
 import os
 import numpy as np
 from matplotlib import pyplot as plt
+
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.datasets import cifar100
+from sklearn.model_selection import train_test_split
+
+import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import layers, activations, regularizers
+from tensorflow.keras import losses, metrics, optimizers
 
 import seaborn as snn
 snn.set(font_scale=1)
 snn.set_style("darkgrid", {"axes.facecolor": ".9"})
+
+#--------------------------------------
+#           Ejercicio 1
+#--------------------------------------
+
+
+def ejercicio_1():
+    from sklearn.datasets import load_boston
+
+    boston = load_boston()
+    # print(boston.DESCR) # Para printear la descripcion del dataset
+
+    dim = len(boston["feature_names"])
+
+    idx = np.arange(506)
+    np.random.shuffle(idx)
+
+    x_train = boston["data"][idx[:-len(idx) // 4]]
+    y_train = boston["target"][idx[:-len(idx) // 4]]
+    x_test = boston["data"][idx[-len(idx) // 4:]]
+    y_test = boston["target"][idx[-len(idx) // 4:]]
+
+    # Centramos y normalizamos los datos
+    media = x_train.mean(axis=0)
+    sigma = x_train.std(axis=0)
+
+    x_train = x_train - media
+    x_train /= sigma
+    x_test = x_test - media
+    x_test /= sigma
+
+    # Con models.Model
+    inputs = keras.layers.Input(shape=x_train.shape[1], name="Input")
+    ol = keras.layers.Dense(1, name="Output")(inputs)
+
+    model = keras.models.Model(inputs=inputs,
+                               outputs=ol,
+                               name="LinearRegression")
+
+    model.summary()
+
+    optimizer = keras.optimizers.SGD(learning_rate=1e-3)
+
+    model.compile(optimizer, loss=keras.losses.MSE, metrics=["mse"])
+
+    history = model.fit(x_train,
+                        y_train,
+                        epochs=200,
+                        validation_data=(x_test, y_test),
+                        verbose=2)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '1')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '1_model.h5'))
+    np.save(os.path.join(data_folder, '1_history.npy'), history.history)
+
+    # Prediccion para los datos de test
+    y_pred = model.predict(x_test)
+
+    # Grafico y guardo figuras
+    img_folder = os.path.join("Informe", 'Figuras', '1')
+    if not os.path.exists(img_folder):
+        os.makedirs(img_folder)
+
+    plt.plot(y_test, y_pred, "ob", label="Predicciones")
+    plt.plot(y_test, y_test, "k", label="Target")
+    plt.xlabel("Precios reales [k$]", fontsize=15)
+    plt.ylabel("Precios predichos [k$]", fontsize=15)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.savefig(os.path.join(img_folder, '1.pdf'),
+                format="pdf",
+                bbox_inches="tight")
+    plt.close()
+
+    plt.plot(history.history['loss'], label="Loss Training")
+    plt.plot(history.history['val_loss'], label="Loss Test")
+    plt.xlabel("Epocas", fontsize=15)
+    plt.ylabel("Loss", fontsize=15)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.savefig(os.path.join(img_folder, '1_Loss.pdf'),
+                format="pdf",
+                bbox_inches="tight")
+    plt.close()
+
+    plt.plot(history.history['mse'], label="Acc. Training")
+    plt.plot(history.history['val_mse'], label="Acc. Test")
+    plt.xlabel("Epocas", fontsize=15)
+    plt.ylabel("Accuracy", fontsize=15)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.savefig(os.path.join(img_folder, '1_Acc.pdf'),
+                format="pdf",
+                bbox_inches="tight")
+    plt.close()
+
+
+#--------------------------------------
+#           Ejercicio 2
+#--------------------------------------
+
+
+def ejercicio_2_EJ3TP2():
+    lr = 1e-4
+    rf = 1e-3
+    batch_size = 128
+    epochs = 100
+    description = "lr={}_rf={}_bs={}".format(lr, rf, batch_size)
+    # Cargo los datos
+    (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+
+    # separo el training en train y validation manteniendo la distribucion (y mezclando)
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                      y_train,
+                                                      test_size=0.2,
+                                                      stratify=y_train)
+
+    # Hago el flatten de los datos
+    x_train = x_train.reshape(len(x_train), x_train[0].size).astype(np.float)
+    x_test = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)
+    x_val = x_val.reshape(len(x_val), x_val[0].size).astype(np.float)
+
+    # Paso los labels a one-hot encoded
+    y_train = keras.utils.to_categorical(y_train, 10)
+    y_test = keras.utils.to_categorical(y_test, 10)
+    y_val = keras.utils.to_categorical(y_val, 10)
+
+    # Normalizacion
+    media = x_train.mean(axis=0)
+    sigma = x_train.std(axis=0)
+
+    x_train = x_train - media
+    x_train /= sigma
+    x_test = x_test - media
+    x_test /= sigma
+    x_val = x_val - media
+    x_val /= sigma
+
+    # Arquitectura de la red segun el ej3 TP2
+    inputs = layers.Input(shape=x_train.shape[1], name="Input")
+
+    l1 = layers.Dense(
+        100,
+        name='Hidden',
+        activation=activations.sigmoid,
+        kernel_regularizer=regularizers.l2(rf),
+    )(inputs)
+
+    output = layers.Dense(10,
+                          name='Output',
+                          activation=activations.linear,
+                          kernel_regularizer=regularizers.l2(rf))(l1)
+
+    model = keras.models.Model(inputs=inputs, outputs=output, name='Ej3_TP2')
+
+    model.compile(optimizer=optimizers.Adam(lr),
+                  loss=losses.mean_squared_error,
+                  metrics=[metrics.CategoricalAccuracy(name="Acc")])
+
+    model.summary()
+
+    hist = model.fit(x_train,
+                     y_train,
+                     epochs=epochs,
+                     validation_data=(x_val, y_val),
+                     batch_size=batch_size,
+                     verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '2_EJ3_TP2')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    # model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)),
+            hist.history)
+
+
+def ejercicio_2_EJ4TP2():
+    lr = 1e-4
+    rf = 1e-3
+    batch_size = 128
+    epochs = 100
+    description = "lr={}_rf={}_bs={}".format(lr, rf, batch_size)
+
+    # Cargo los datos
+    (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+
+    # separo el training en train y validation manteniendo la distribucion (y mezclando)
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=0.2,
+                                                    stratify=y_train)
+
+    # Hago el flatten de los datos
+    x_train = x_train.reshape(len(x_train), x_train[0].size).astype(np.float)
+    x_test = x_test.reshape(len(x_test), x_test[0].size).astype(np.float)
+    x_val = x_val.reshape(len(x_val), x_val[0].size).astype(np.float)
+
+    # Paso los labels a one-hot representation
+    y_train = keras.utils.to_categorical(y_train, 10)
+    y_test = keras.utils.to_categorical(y_test, 10)
+    y_val = keras.utils.to_categorical(y_val, 10)
+
+    # Normalizacion
+    media = x_train.mean(axis=0)
+    sigma = x_train.std(axis=0)
+
+    x_train = x_train - media
+    x_train /= sigma
+    x_test = x_test - media
+    x_test /= sigma
+    x_val = x_val - media
+    x_val /= sigma
+
+    # Arquitectura de la red segun el ej4 TP2
+    inputs = layers.Input(shape=x_train.shape[1], name="Input")
+
+    l1 = layers.Dense(
+        100,
+        name='Hidden',
+        activation=activations.sigmoid,
+        kernel_regularizer=regularizers.l2(rf),
+    )(inputs)
+
+    output = layers.Dense(10,
+                        name='Output',
+                        activation=activations.linear,
+                        kernel_regularizer=regularizers.l2(rf))(l1)
+
+    model = keras.models.Model(inputs=inputs, outputs=output, name='Ej4_TP2')
+
+    model.compile(optimizer=optimizers.Adam(lr),
+                loss=losses.CategoricalCrossentropy(from_logits=True),
+                metrics=[metrics.CategoricalAccuracy(name="Acc")])
+
+    model.summary()
+
+    hist = model.fit(x_train,
+                    y_train,
+                    epochs=epochs,
+                    validation_data=(x_val, y_val),
+                    batch_size=batch_size,
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+def ejercicio_2_XOR_A():
+    lr = 1e-3
+    rf = 0
+    batch_size = None
+    epochs = 10000
+    description = "lr={}_rf={}_bs={}".format(lr, rf, batch_size)
+
+    # Datos que no son datos
+    x_train = np.array([[-1, -1], [-1, 1], [1, -1], [1, 1]])
+    y_train = np.array([[1], [-1], [-1], [1]])
+
+    # Arquitectura de la red
+    inputs = layers.Input(shape=(x_train.shape[1], ), name="Input")
+
+    layer_1 = layers.Dense(2, name='Hidden_1', activation=activations.tanh)(inputs)
+
+    outputs = layers.Dense(1, name='Output', activation=activations.tanh)(layer_1)
+
+    model = keras.models.Model(inputs=inputs,
+                            outputs=outputs,
+                            name='XOR_Arquitectura_1')
+
+
+    # Defino accuracy para el problema de XOR
+    def my_acc(y_true, y_pred):
+        acc = tf.reduce_mean(
+            tf.cast(tf.less_equal(tf.abs(y_true - y_pred), 0.1), tf.float32))
+        return acc
+
+
+    model.compile(optimizer=keras.optimizers.Adam(lr),
+                loss=losses.MSE,
+                metrics=[my_acc])
+
+    model.summary()
+
+    hist = model.fit(x_train, y_train, epochs=epochs, verbose=2)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '2_XOR_A')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
+
+def ejercicio_2_XOR_B():
+    lr = 1e-3
+    rf = 0
+    batch_size = None
+    epochs = 10000
+    description = "lr={}_rf={}_bs={}".format(lr, rf, batch_size)
+
+    # Datos que no son datos
+    x_train = np.array([[-1, -1], [-1, 1], [1, -1], [1, 1]])
+    y_train = np.array([[1], [-1], [-1], [1]])
+
+    # Arquitectura de la red
+    inputs = layers.Input(shape=(x_train.shape[1], ), name="Input")
+
+    layer_1 = layers.Dense(1, name='Hidden_1', activation=activations.tanh)(inputs)
+
+    concat = layers.Concatenate()([inputs, layer_1])
+
+    outputs = layers.Dense(1, name='Output', activation=activations.tanh)(concat)
+
+    model = keras.models.Model(inputs=inputs,
+                            outputs=outputs,
+                            name='XOR_Arquitectura_2')
+
+
+    # Defino accuracy para el problema de XOR
+    def my_acc(y_true, y_pred):
+        acc = tf.reduce_mean(
+            tf.cast(tf.less_equal(tf.abs(y_true - y_pred), 0.1), tf.float32))
+        return acc
+
+
+    model.compile(optimizer=keras.optimizers.Adam(lr),
+                loss=losses.MSE,
+                metrics=[my_acc])
+
+    model.summary()
+
+    hist = model.fit(x_train, y_train, epochs=epochs, verbose=2)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '2_XOR_B')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
+    # Guardo las imagenes
+    img_folder = os.path.join('Figuras', '2_XOR_B')
+    if not os.path.exists(img_folder):
+        os.makedirs(img_folder)
+
+#--------------------------------------
+#           Ejercicio 3
+#--------------------------------------
+
+#--------------------------------------
+#           Ejercicio 4
+#--------------------------------------
+
+#--------------------------------------
+#           Ejercicio 5
+#--------------------------------------
+
+#--------------------------------------
+#           Ejercicio 6
+#--------------------------------------
+
+#--------------------------------------
+#           Ejercicio 7
+#--------------------------------------
+
+#--------------------------------------
+#           Ejercicio 8
+#--------------------------------------
+
+#--------------------------------------
+#           Ejercicio 9
+#--------------------------------------
+
+#--------------------------------------
+#           Ejercicio 10
+#--------------------------------------
+
+#--------------------------------------
+#   Funciones para hacer los graficos
+#--------------------------------------
 
 
 def graficos_2_EJ3TP2():
@@ -947,10 +1342,13 @@ def graficos_10_VGG_Cifar100():
 
 
 if __name__ == "__main__":
+
+    # ejercicio_1()
+
+    # ejercicio_2_EJ3TP2()
+
     # graficos_2_EJ3TP2()
-
     # graficos_2_EJ4TP2()
-
     # graficos_2_XOR()
 
     # graficos_3_BN()
