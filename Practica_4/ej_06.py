@@ -140,7 +140,7 @@ if not os.path.exists(img_folder):
 
 xx = np.arange(epochs)
 plt.fill_between(xx, results['train_min'], results['train_max'], alpha=0.35)
-plt.plot(results['train_mean'], '-')
+plt.plot(results['train_mean'])
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
 # plt.legend(loc='best')
@@ -152,7 +152,7 @@ plt.close()
 
 # Grafico
 plt.fill_between(xx, results['test_min'], results['test_max'], alpha=0.35)
-plt.plot(results['test_mean'], '-')
+plt.plot(results['test_mean'])
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Test Accuracy", fontsize=15)
 plt.tight_layout()
@@ -162,9 +162,9 @@ plt.savefig(os.path.join(img_folder, 'Acc_Test_{}.png'.format(description)),
 plt.close()
 
 plt.fill_between(xx, results['ltrain_min'], results['ltrain_max'], alpha=0.35)
-plt.plot(results['ltrain_mean'], '-', label="Loss Training")
+plt.plot(results['ltrain_mean'], label="Loss Training")
 plt.fill_between(xx, results['ltest_min'], results['ltest_max'], alpha=0.35)
-plt.plot(results['ltest_mean'], '-', label="Loss Test")
+plt.plot(results['ltest_mean'], label="Loss Test")
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
