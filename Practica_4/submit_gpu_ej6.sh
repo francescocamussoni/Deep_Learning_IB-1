@@ -45,30 +45,30 @@ python ej_06.py -lr 1e-1 -rf 1e-3 -e 500 -bs 32 -nn 20
 python ej_06.py -lr 1e-1 -rf 0    -e 500 -bs 32 -nn 20
 
 ######################
-python ej_06.py -lr 1e-5 -rf 1e-1 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-5 -rf 1e-2 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-5 -rf 1e-3 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-5 -rf 0    -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-5 -rf 1e-1 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-5 -rf 1e-2 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-5 -rf 1e-3 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-5 -rf 0    -e 500 -bs 64 -nn 20
 
-python ej_06.py -lr 1e-4 -rf 1e-1 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-4 -rf 1e-2 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-4 -rf 1e-3 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-4 -rf 0    -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-4 -rf 1e-1 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-4 -rf 1e-2 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-4 -rf 1e-3 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-4 -rf 0    -e 500 -bs 64 -nn 20
 
-python ej_06.py -lr 1e-3 -rf 1e-1 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-3 -rf 1e-2 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-3 -rf 1e-3 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-3 -rf 0    -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-3 -rf 1e-1 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-3 -rf 1e-2 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-3 -rf 1e-3 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-3 -rf 0    -e 500 -bs 64 -nn 20
 
-python ej_06.py -lr 1e-2 -rf 1e-1 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-2 -rf 1e-2 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-2 -rf 1e-3 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-2 -rf 0    -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-2 -rf 1e-1 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-2 -rf 1e-2 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-2 -rf 1e-3 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-2 -rf 0    -e 500 -bs 64 -nn 20
 
-python ej_06.py -lr 1e-1 -rf 1e-1 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-1 -rf 1e-2 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-1 -rf 1e-3 -e 500 -bs 64 -nn 20
-python ej_06.py -lr 1e-1 -rf 0    -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-1 -rf 1e-1 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-1 -rf 1e-2 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-1 -rf 1e-3 -e 500 -bs 64 -nn 20
+# python ej_06.py -lr 1e-1 -rf 0    -e 500 -bs 64 -nn 20
 
 
 # Ejercicio 6, con dos capas de 40 neuronas
@@ -98,30 +98,30 @@ python ej_06.py -lr 1e-1 -rf 1e-3 -e 500 -bs 32 -nn 40
 python ej_06.py -lr 1e-1 -rf 0    -e 500 -bs 32 -nn 40
 
 ######################
-python ej_06.py -lr 1e-5 -rf 1e-1 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-5 -rf 1e-2 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-5 -rf 1e-3 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-5 -rf 0    -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-5 -rf 1e-1 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-5 -rf 1e-2 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-5 -rf 1e-3 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-5 -rf 0    -e 500 -bs 64 -nn 40
 
-python ej_06.py -lr 1e-4 -rf 1e-1 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-4 -rf 1e-2 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-4 -rf 1e-3 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-4 -rf 0    -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-4 -rf 1e-1 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-4 -rf 1e-2 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-4 -rf 1e-3 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-4 -rf 0    -e 500 -bs 64 -nn 40
 
-python ej_06.py -lr 1e-3 -rf 1e-1 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-3 -rf 1e-2 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-3 -rf 1e-3 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-3 -rf 0    -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-3 -rf 1e-1 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-3 -rf 1e-2 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-3 -rf 1e-3 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-3 -rf 0    -e 500 -bs 64 -nn 40
 
-python ej_06.py -lr 1e-2 -rf 1e-1 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-2 -rf 1e-2 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-2 -rf 1e-3 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-2 -rf 0    -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-2 -rf 1e-1 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-2 -rf 1e-2 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-2 -rf 1e-3 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-2 -rf 0    -e 500 -bs 64 -nn 40
 
-python ej_06.py -lr 1e-1 -rf 1e-1 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-1 -rf 1e-2 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-1 -rf 1e-3 -e 500 -bs 64 -nn 40
-python ej_06.py -lr 1e-1 -rf 0    -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-1 -rf 1e-1 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-1 -rf 1e-2 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-1 -rf 1e-3 -e 500 -bs 64 -nn 40
+# python ej_06.py -lr 1e-1 -rf 0    -e 500 -bs 64 -nn 40
 
 
 

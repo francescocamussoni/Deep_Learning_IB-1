@@ -30,7 +30,7 @@ path_folder = os.path.join("/", "share", "apps", "DeepLearning", "Datos")
 file = "pima-indians-diabetes.csv"
 path_file = os.path.join(path_folder, file)
 
-path_file = '/run/user/1000/gvfs/sftp:host=10.73.25.223,user=facundo.cabrera/share/apps/DeepLearning/Datos/pima-indians-diabetes.csv'
+# path_file = '/run/user/1000/gvfs/sftp:host=10.73.25.223,user=facundo.cabrera/share/apps/DeepLearning/Datos/pima-indians-diabetes.csv'
 
 data = np.loadtxt(path_file, delimiter=',')
 
@@ -43,13 +43,13 @@ model = keras.models.Sequential(name='Ejercicio_6')
 model.add(
     layers.Dense(nn,
                  input_shape=(x.shape[1], ),
-                 activation=activations.relu,
+                 activation='relu',
                  kernel_regularizer=regularizers.l2(rf),
                  name="Hidden_1"))
 
 model.add(
     layers.Dense(nn,
-                 activation=activations.relu,
+                 activation='relu',
                  kernel_regularizer=regularizers.l2(rf),
                  name="Hidden_2"))
 
