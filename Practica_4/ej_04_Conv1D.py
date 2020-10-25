@@ -49,7 +49,7 @@ x_train, x_val, y_train, y_val = train_test_split(x_train,
 # Arquitecura con Convolucionales
 model = keras.models.Sequential(name='Ejercicio_4_Conv')
 
-model.add(layers.Embedding(dim, embedding_dim, input_length=x.shape[1]))
+model.add(layers.Embedding(dim, embedding_dim, input_length=x_train.shape[1]))
 
 model.add(layers.Dropout(drop_arg))
 model.add(layers.BatchNormalization())

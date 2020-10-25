@@ -49,7 +49,7 @@ x_train, x_val, y_train, y_val = train_test_split(x_train,
 # Arquitectura con dropout
 model = keras.models.Sequential(name='Ejercicio_4_Embedding')
 
-model.add(layers.Embedding(dim, embedding_dim, input_length=x.shape[1]))
+model.add(layers.Embedding(dim, embedding_dim, input_length=x_train.shape[1]))
 model.add(layers.Flatten())
 
 model.add(layers.Dense(nn, activation=activations.relu, name="Hidden_1"))
