@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-date: 24-10-2020
-File: graphics.py
+date: 22-10-2020
+File: Cabrera.py
 Author : Facundo Martin Cabrera
 Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
@@ -25,15 +25,7 @@ snn.set_style("darkgrid", {"axes.facecolor": ".9"})
 
 
 
-def sinplot(flip=1):
-    x = np.linspace(0, 14, 100)
-    for i in range(1, 7):
-        plt.plot(x, np.sin(x + i * .5) * (7 - i) * flip)
-    plt.show()
 
-
-
-# sinplot()
 
 
 
