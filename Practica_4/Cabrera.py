@@ -701,9 +701,225 @@ def ejercicio_3_L2():
 #           Ejercicio 4
 #--------------------------------------
 
+def ejercicio_4_Embedding():
+    lr = 1e-3
+    epochs = 100
+    batch_size = 256
+    embedding_dim = 75
+    nn = 25
+    description = "lr={}_bs={}_nn={}".format(
+        lr, batch_size, nn)
+
+    # importo los datos
+    dim = 10000
+    (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=dim)
+
+    # Muchos datos de test, prefiero dividirlo en proporciones distintas
+    x_train, y_train = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
+    # Hacemos el padding ahora que estan todos los datos juntos
+    x_train = keras.preprocessing.sequence.pad_sequences(x_train,
+                                                        padding='post',
+                                                        dtype=np.float)
+    # Separo los datos de test
+    x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                        y_train,
+                                                        test_size=0.2,
+                                                        stratify=y_train)
+    # Ahora separo entre training y validacion
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=0.25,
+                                                    stratify=y_train)
+
+    # Arquitectura con dropout
+    model = keras.models.Sequential(name='Ejercicio_4_Embedding')
+
+    model.add(layers.Embedding(dim, embedding_dim, input_length=x_train.shape[1]))
+    model.add(layers.Flatten())
+
+    model.add(layers.Dense(nn, activation=activations.relu, name="Hidden_1"))
+    model.add(layers.Dense(nn, activation=activations.relu, name="Hidden_2"))
+    model.add(layers.Dense(1, activation=activations.linear, name="Output"))
+
+    model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+                loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
+                metrics=[metrics.BinaryAccuracy(name='B_Acc')])
+
+    model.summary()
+
+    # Entreno
+    hist = model.fit(x_train,
+                    y_train,
+                    validation_data=(x_val, y_val),
+                    epochs=epochs,
+                    batch_size=batch_size,
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '4_Embedding')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
+def ejercicio_4_Conv():
+    lr = 1e-3
+    rf = 1e-3
+    epochs = 100
+    batch_size = 256
+    embedding_dim = 75
+    drop_arg = 0.2
+    nn = 25
+    description = "lr={}_bs={}_nn={}".format(
+        lr, batch_size, nn)
+    
+    # importo los datos
+    dim = 10000
+    (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=dim)
+
+    # Muchos datos de test, prefiero dividirlo en proporciones distintas
+    x_train, y_train = np.hstack((x_train, x_test)), np.hstack((y_train, y_test))
+    # Hacemos el padding ahora que estan todos los datos juntos
+    x_train = keras.preprocessing.sequence.pad_sequences(x_train,
+                                                        padding='post',
+                                                        dtype=np.float)
+    # Separo los datos de test
+    x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                        y_train,
+                                                        test_size=0.2,
+                                                        stratify=y_train)
+    # Ahora separo entre training y validacion
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=0.25,
+                                                    stratify=y_train)
+
+    # Arquitecura con Convolucionales
+    model = keras.models.Sequential(name='Ejercicio_4_Conv')
+
+    model.add(layers.Embedding(dim, embedding_dim, input_length=x_train.shape[1]))
+
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.BatchNormalization())
+
+    model.add(
+        layers.Conv1D(
+            filters=32,
+            kernel_size=3,
+            padding='same',
+            activation=activations.relu,
+            kernel_regularizer=regularizers.l2(rf),
+        ))
+    model.add(layers.MaxPooling1D())
+
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.BatchNormalization())
+
+    model.add(
+        layers.Conv1D(
+            filters=64,
+            kernel_size=3,
+            padding='same',
+            activation=activations.relu,
+            kernel_regularizer=regularizers.l2(rf),
+        ))
+    model.add(layers.MaxPooling1D())
+    model.add(layers.Flatten())
+
+    model.add(layers.Dropout(drop_arg))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.Dense(1, activation=activations.linear, name="Output"))
+
+    model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+                loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
+                metrics=[metrics.BinaryAccuracy(name='B_Acc')])
+
+    model.summary()
+
+    # Entreno
+    hist = model.fit(x_train,
+                    y_train,
+                    validation_data=(x_val, y_val),
+                    epochs=epochs,
+                    batch_size=batch_size,
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '4_Conv')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
 #--------------------------------------
 #           Ejercicio 5
 #--------------------------------------
+
+def ejercicio_5():
+    lr = 1e-3
+    rf = 1e-3
+    epochs = 200
+    batch_size = 1024
+    description = "lr={}_bs={}".format(
+        lr, batch_size)
+
+    # Datos
+    nData = 1000000
+    x = np.linspace(0, 1, nData).reshape((nData, 1))
+    y = 4 * x * (1 - x)
+
+    # Separo los datos de test
+    x, x_test, y, y_test = train_test_split(x, y, test_size=0.1)
+    # Ahora separo entre training y validacion
+    x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=1 / 9)
+
+    # Arquitectura de la red
+    inputs = layers.Input(shape=(x_train.shape[1], ), name="Input")
+
+    layer_1 = layers.Dense(5,
+                        activation=activations.tanh,
+                        kernel_regularizer=regularizers.l2(rf),
+                        name='Hidden')(inputs)
+
+    concat = layers.Concatenate()([inputs, layer_1])
+
+    outputs = layers.Dense(1,
+                        activation=activations.linear,
+                        kernel_regularizer=regularizers.l2(rf),
+                        name='Output')(concat)
+
+    model = keras.models.Model(inputs=inputs, outputs=outputs, name='Ejercicio_5')
+
+    model.compile(optimizer=optimizers.SGD(learning_rate=lr),
+                loss=losses.MeanSquaredError(name='loss'),
+                metrics=[metrics.MeanSquaredError(name='acc_MSE')])
+
+    model.summary()
+
+    # Entreno
+    hist = model.fit(x_train,
+                    y_train,
+                    validation_data=(x_val, y_val),
+                    epochs=epochs,
+                    batch_size=batch_size,
+                    verbose=2)
+
+    # Calculo la loss y Accuracy para los datos de test
+    test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+    # Guardo los datos
+    data_folder = os.path.join('Datos', '5')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    model.save(os.path.join(data_folder, '{}.h5'.format(description)))
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 #--------------------------------------
 #           Ejercicio 6
@@ -1677,8 +1893,10 @@ if __name__ == "__main__":
     # graficos_3_Dropout()
     # graficos_3_L2()
 
-    # graficos_4_Embedding()
+    ejercicio_4_Embedding()
+    ejercicio_4_Conv()
 
+    # graficos_4_Embedding()
     # graficos_4_Conv()
 
     # graficos_5()
@@ -1687,7 +1905,7 @@ if __name__ == "__main__":
 
     # graficos_6_40N()
 
-    graficos_6_CCorreccion()
+    # graficos_6_CCorreccion()
 
     # graficos_7()
 
