@@ -20,6 +20,7 @@ from tensorflow.keras.datasets import cifar100
 from tensorflow.keras.datasets import imdb
 
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 
 import tensorflow as tf
 from tensorflow import keras
@@ -867,8 +868,7 @@ def ejercicio_5():
     rf = 1e-3
     epochs = 200
     batch_size = 1024
-    description = "lr={}_bs={}".format(
-        lr, batch_size)
+    description = "lr={}_bs={}".format(lr, batch_size)
 
     # Datos
     nData = 1000000
@@ -924,6 +924,150 @@ def ejercicio_5():
 #--------------------------------------
 #           Ejercicio 6
 #--------------------------------------
+
+# Funcion auxiliar
+def toDictionary(va, a, vl, l):
+
+    res = {
+        'test_min': va.min(axis=0),
+        'test_max': va.max(axis=0),
+        'test_mean': va.mean(axis=0),
+        'train_min': a.min(axis=0),
+        'train_max': a.max(axis=0),
+        'train_mean': a.mean(axis=0),
+        'ltest_min': vl.min(axis=0),
+        'ltest_max': vl.max(axis=0),
+        'ltest_mean': vl.mean(axis=0),
+        'ltrain_min': l.min(axis=0),
+        'ltrain_max': l.max(axis=0),
+        'ltrain_mean': l.mean(axis=0)
+    }
+
+    return res
+
+def ejercicio_6(nn,correccion=False, masCapas=False):
+    lr = 1e-3
+    rf = 1e-3
+    epochs = 500
+    batch_size = 32
+    description = "lr={}_bs={}".format(lr, batch_size)
+    # Cargo los datos
+    # Probar esto desde el cluster. Edit: Parece que funciona
+    path_folder = os.path.join("/", "share", "apps", "DeepLearning", "Datos")
+    file = "pima-indians-diabetes.csv"
+    path_file = os.path.join(path_folder, file)
+    path_file = '/run/user/1000/gvfs/sftp:host=10.73.25.223,user=facundo.cabrera/share/apps/DeepLearning/Datos/pima-indians-diabetes.csv'
+
+    try:
+        data = np.loadtxt(path_file, delimiter=',')
+    except :
+        print("Ej 6 - No se encontro el archivo pima-indians-diabetes.csv")
+        return
+
+
+    x = data[:, :-1]
+    y = data[:, -1].reshape((data.shape[0], 1))
+
+    if correccion:
+        # Correcion para los datos que tienen muchos ceros
+        # Primero saco las columnas 3 y 4 porque tienen demasiados ceros
+        # En principio se puede reemplazar por la media, pero me parecen muchos datos
+        # a modificar, prefiero probar sacando esos datos.
+        x = np.delete(x, [3,4], 1)
+        # Las que ahora soon las columnas 1, 2 y 3 tambien tienen ceros , pero son
+        # menos, asi que en vez de eliminar esos datos lo que hago es reemplazar por
+        # la media del resto de datos
+        means = np.copy(x)
+        means[:,1:4][means[:,1:4] == 0] = np.nan    # Reamplazo los 0 por nan
+        means = np.nanmean(means[:,1:4], axis=0)    # Calculo mean sin los nan
+        # Reemplazo los ceros por la meadia calculada
+        x[:,1][x[:,1] == 0] = means[0]
+        x[:,2][x[:,2] == 0] = means[1]
+        x[:,3][x[:,3] == 0] = means[2]
+
+    # Arquitectura de la red
+    model = keras.models.Sequential(name='Ejercicio_6')
+
+    model.add(
+        layers.Dense(nn,
+                    input_shape=(x.shape[1], ),
+                    activation='relu',
+                    kernel_regularizer=regularizers.l2(rf)))
+
+    model.add(
+        layers.Dense(nn,
+                    activation='relu',
+                    kernel_regularizer=regularizers.l2(rf)))
+    
+    if masCapas:
+        model.add(
+        layers.Dense(nn,
+                    activation='relu',
+                    kernel_regularizer=regularizers.l2(rf)))
+        model.add(
+        layers.Dense(nn,
+                    activation='relu',
+                    kernel_regularizer=regularizers.l2(rf)))
+
+
+    model.add(layers.Dense(1, activation=activations.linear, name="Output"))
+
+    model.compile(optimizer=optimizers.SGD(learning_rate=lr),
+                loss=losses.BinaryCrossentropy(from_logits=True, name='loss'),
+                metrics=[metrics.BinaryAccuracy(name='Acc')])
+
+    model.summary()
+
+    # Guardo los pesos para cargarlos y "ressetear" el modelo en cada fold
+    data_folder = os.path.join('Datos', '6_CORRECION')
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    sv = os.path.join(data_folder, "modelo_SIN_entrenar.h5")
+    model.save_weights(sv)
+
+    # 5-folding de los datos
+    kf = KFold(n_splits=5, shuffle=True)
+
+    # idx = np.arange(20)
+    idx = np.arange(x.shape[0])
+    # check = np.array([])
+
+    acc_test = np.array([])
+    acc_train = np.array([])
+    loss_test = np.array([])
+    loss_train = np.array([])
+
+    for train_index, test_index in kf.split(idx):
+
+        x_train, x_test = x[train_index], x[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+
+        # Cargo los pesos del modelo sin entrenar
+        model.load_weights(sv)
+
+        # Entreno
+        hist = model.fit(x_train,
+                        y_train,
+                        validation_data=(x_test, y_test),
+                        epochs=epochs,
+                        batch_size=batch_size,
+                        verbose=2)
+
+        acc_test = np.concatenate((acc_test, hist.history['val_Acc']))
+        acc_train = np.concatenate((acc_train, hist.history['Acc']))
+
+        loss_test = np.concatenate((loss_test, hist.history['loss']))
+        loss_train = np.concatenate((loss_train, hist.history['val_loss']))
+
+    # os.remove(sv)     # esto me genera problemas. No se bien porque
+
+    acc_test = acc_test.reshape((5, epochs))
+    acc_train = acc_train.reshape((5, epochs))
+    loss_test = loss_test.reshape((5, epochs))
+    loss_train = loss_train.reshape((5, epochs))
+
+    results = toDictionary(acc_test, acc_train, loss_test, loss_train)
+    np.save(os.path.join(data_folder, '{}.npy'.format(description)), results)
 
 #--------------------------------------
 #           Ejercicio 7
@@ -1893,18 +2037,22 @@ if __name__ == "__main__":
     # graficos_3_Dropout()
     # graficos_3_L2()
 
-    ejercicio_4_Embedding()
-    ejercicio_4_Conv()
+    # ejercicio_4_Embedding()
+    # ejercicio_4_Conv()
 
     # graficos_4_Embedding()
     # graficos_4_Conv()
 
+    # ejercicio_5()
     # graficos_5()
 
+    # ejercicio_6(20)
+    # ejercicio_6(40)
+    # ejercicio_6(20,correccion=True)
+    # ejercicio_6(20,masCapas=True)
+
     # graficos_6()
-
     # graficos_6_40N()
-
     # graficos_6_CCorreccion()
 
     # graficos_7()
