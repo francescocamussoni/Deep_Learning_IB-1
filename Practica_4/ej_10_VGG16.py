@@ -80,14 +80,14 @@ model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(64, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 
-model.add(layers.MaxPool2D(3, strides=2))
+model.add(layers.MaxPool2D(2, strides=2))
 
 model.add(layers.Conv2D(128, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(128, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 
-model.add(layers.MaxPool2D(3, strides=1))
+model.add(layers.MaxPool2D(2, strides=2))
 
 model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
@@ -96,7 +96,7 @@ model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 
-model.add(layers.MaxPool2D(3, strides=1))
+model.add(layers.MaxPool2D(2, strides=1))
 
 model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
@@ -105,7 +105,7 @@ model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 
-model.add(layers.MaxPool2D(3, strides=1))
+model.add(layers.MaxPool2D(2, strides=1))
 
 model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
@@ -114,18 +114,18 @@ model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 
-model.add(layers.MaxPool2D(3, strides=1))
+model.add(layers.MaxPool2D(2, strides=1))
 
 model.add(layers.Flatten())
 model.add(layers.Dropout(0.3))
 model.add(layers.BatchNormalization())
-model.add(layers.Dense(2048, activation='relu', kernel_regularizer=l2(rf)))
-model.add(layers.Dropout(0.3))
-model.add(layers.BatchNormalization())
 model.add(layers.Dense(1024, activation='relu', kernel_regularizer=l2(rf)))
 model.add(layers.Dropout(0.3))
 model.add(layers.BatchNormalization())
-model.add(layers.Dense(1024, activation='relu', kernel_regularizer=l2(rf)))
+model.add(layers.Dense(512, activation='relu', kernel_regularizer=l2(rf)))
+model.add(layers.Dropout(0.3))
+model.add(layers.BatchNormalization())
+model.add(layers.Dense(512, activation='relu', kernel_regularizer=l2(rf)))
 model.add(layers.Dense(n_classes, activation='linear'))
 
 

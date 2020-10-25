@@ -2305,18 +2305,27 @@ def graficos_5():
                 bbox_inches="tight")
     plt.show()
 
-    plt.plot(data['B_Acc'], label="Acc. Training")
-    plt.plot(data['val_B_Acc'], label="Acc. Validation")
-    # plt.title("Acc Test: {:.3f}".format(test_Acc))
-    plt.xlabel("Epocas")
-    plt.ylabel("Accuracy")
-    plt.legend(loc='best')
-    plt.tight_layout()
-    plt.savefig(os.path.join(img_folder, 'Acc.pdf'),
-                format="pdf",
+    np.random.seed(10)
+    x_0 = np.random.rand()
+
+    exact = np.array([x_0])
+    wNN = np.array([x_0])
+
+    for i in range(100):
+        x_t = mapeoLogistico(exact[-1])
+        x_t_nn = model.predict([wNN[-1]])
+
+        exact = np.append(exact, x_t)
+        wNN = np.append(wNN, x_t_nn)
+    
+    plt.plot(exact, label="Exacta")
+    plt.plot(wNN, label="Con RN")
+    plt.xlabel("Iteracioines")
+    plt.ylabel(r"$x(t)$")
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.11), ncol=2)
+    plt.savefig(os.path.join(img_folder, 'Evolucion.pdf'),format="pdf",
                 bbox_inches="tight")
     plt.show()
-
 
 def graficos_6():
     path_data = os.path.join(
