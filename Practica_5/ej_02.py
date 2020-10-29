@@ -15,3 +15,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 import tensorflow as tf
+from tensorflow.keras import layers
+
+
