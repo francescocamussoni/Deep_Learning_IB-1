@@ -69,12 +69,36 @@ if not os.path.exists(save_images):
         np.save(save_images, images)
         np.save(save_label, labels)
 
+# Importo los datos
+x_train = np.load(save_images)
+y_train = np.load(save_label)
 
+# Separo los datos de test
+x_train, x_test, y_train, y_test = train_test_split(x_train,
+                                                    y_train,
+                                                    test_size=4000,
+                                                    stratify=y_train)
+# Ahora separo entre training y validacion
+x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                  y_train,
+                                                  test_size=4000,
+                                                  stratify=y_train)
 
+# Normalizacion
+media = x_train.mean(axis=0)
+sigma = x_train.std(axis=0)
 
+x_train = x_train - media
+x_train /= sigma
+x_test = x_test - media
+x_test /= sigma
+x_val = x_val - media
+x_val /= sigma
 
-
-
+# Paso los labels a one-hot encoded
+#y_train = keras.utils.to_categorical(y_train, n_classes)
+#y_test = keras.utils.to_categorical(y_test, n_classes)
+#y_val = keras.utils.to_categorical(y_val, n_classes)
 
 
 
