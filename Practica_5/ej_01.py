@@ -20,7 +20,7 @@ from tensorflow.keras import regularizers
 
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
-small_dataset = True
+small_dataset = False
 #path_data = "/home/cabre1994/Desktop/Deep_Learning/Deep_Learning_IB/Datasets"
 path_data = os.getcwd()
 
@@ -42,8 +42,8 @@ if not os.path.exists(save_images):
     for file in os.listdir(path_data):
         print(i)
         i += 1
-        if i > 100:
-            continue
+        #if i > 100:
+        #    continue
         
         if small_dataset:
             img = load_img(os.path.join(path_data,file))
@@ -61,7 +61,6 @@ if not os.path.exists(save_images):
         #import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
 
     if small_dataset:
-        import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
         images = images.reshape(-1,32,32,3)
         np.save(save_images, images)
         np.save(save_label, labels)
