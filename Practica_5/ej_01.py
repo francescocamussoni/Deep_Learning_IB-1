@@ -48,7 +48,7 @@ if not os.path.exists(save_images):
         if small_dataset:
             img = load_img(os.path.join(path_data,file))
         else:
-            img = load_img(os.path.join(path_data,file), target_size=(299,299,3))
+            img = load_img(os.path.join(path_data,file), target_size=(299,299,3),interpolation="bilinear")
 
         img_arr = img_to_array(img).astype(np.uint8)
 
