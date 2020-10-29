@@ -14,13 +14,22 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-import tensorflow.keras as keras
-from tensorflow.keras import layers, activations, optimizers
-from tensorflow.keras import regularizers
+# Script propio para pasar argumentos por linea de comandos
+from utils import lr, rf, epochs, batch_size, description
+from utils import small_dataset
 
+from sklearn.model_selection import train_test_split
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers, activations, regularizers
+from tensorflow.keras import losses, metrics, optimizers
+from tensorflow.keras.regularizers import l2
+
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
-small_dataset = False
+#small_dataset = True
 #path_data = "/home/cabre1994/Desktop/Deep_Learning/Deep_Learning_IB/Datasets"
 path_data = os.getcwd()
 
@@ -58,7 +67,6 @@ if not os.path.exists(save_images):
             labels = np.append(labels, 0)
         else:
             labels = np.append(labels, 1)
-        #import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
 
     if small_dataset:
         images = images.reshape(-1,32,32,3)
@@ -99,7 +107,6 @@ x_val /= sigma
 #y_train = keras.utils.to_categorical(y_train, n_classes)
 #y_test = keras.utils.to_categorical(y_test, n_classes)
 #y_val = keras.utils.to_categorical(y_val, n_classes)
-
 
 
 # Arquitectura de la mini-VGG16
@@ -160,7 +167,70 @@ model.add(layers.BatchNormalization())
 model.add(layers.Dense(512, activation='relu', kernel_regularizer=l2(rf)))
 model.add(layers.Dense(1, activation='linear'))
 
-
 model.summary()
 
+model.compile(optimizer=optimizers.Adam(learning_rate=lr),
+              loss=losses.BinaryCrossentropy(from_logits=True),
+              metrics=[metrics.BinaryAccuracy(name='CAcc')])
 
+
+IDG = ImageDataGenerator(
+    rotation_range=45,  # Ang max de rotaciones
+    width_shift_range=5,    # Cant de pixeles que puede trasladarse, sepuede pasar una
+    height_shift_range=5,   # fraccion de la dimension en vez de un entero
+    shear_range=0.,     # No entendi que es
+    zoom_range=0.,      # Por lo que vi, queda re feo asi que no lo uso
+    fill_mode='nearest',    # Estrategia para llenar los huecos
+    horizontal_flip=True,   # Reflexion horizontal b -> d
+    vertical_flip=False,    # Reflexion vertical   ! -> ¡
+    # Con esto alcanza creo, el resto no tengo tan claro como funciona
+    # y prefiero dejarlo asi
+)
+
+# Only required if featurewise_center or featurewise_std_normalization
+# or zca_whitening are set to True.
+# IDG.fit(x_train)
+
+hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
+                 epochs=epochs,
+                 steps_per_epoch=len(x_train) / batch_size,
+                 validation_data=(x_val, y_val),
+                 verbose=2)
+
+# Calculo la loss y Accuracy para los datos de test
+test_loss, test_Acc = model.evaluate(x_test, y_test)
+
+data_folder = os.path.join('Datos', '1')
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
+
+# Guardo las imagenes
+img_folder = os.path.join('Figuras', '1')
+if not os.path.exists(img_folder):
+    os.makedirs(img_folder)
+
+# Grafico
+plt.plot(hist.history['loss'], label="Loss Training")
+plt.plot(hist.history['val_loss'], label="Loss Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
+plt.xlabel("Epocas", fontsize=15)
+plt.ylabel("Loss", fontsize=15)
+plt.legend(loc='best')
+plt.tight_layout()
+plt.savefig(os.path.join(img_folder, 'Loss_{}.png'.format(description)),
+            format="png",
+            bbox_inches="tight")
+plt.close()
+
+plt.plot(hist.history['CAcc'], label="Acc. Training")
+plt.plot(hist.history['val_CAcc'], label="Acc. Validation")
+plt.title("Acc Test: {:.3f}".format(test_Acc))
+plt.xlabel("Epocas", fontsize=15)
+plt.ylabel("Accuracy", fontsize=15)
+plt.legend(loc='best')
+plt.tight_layout()
+plt.savefig(os.path.join(img_folder, 'Acc_{}.png'.format(description)),
+            format="png",
+            bbox_inches="tight")
+plt.close()
