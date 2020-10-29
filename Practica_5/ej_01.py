@@ -68,3 +68,75 @@ if not os.path.exists(save_images):
         images = images.reshape(-1,299,299,3)
         np.save(save_images, images)
         np.save(save_label, labels)
+
+
+
+
+
+
+
+
+
+
+# Arquitectura de la mini-VGG16
+model = keras.models.Sequential(name='Mini-VGG16')
+
+model.add(layers.Input(shape=(32, 32, 3)))
+
+model.add(layers.Conv2D(64, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(64, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+
+model.add(layers.MaxPool2D(2, strides=2))
+
+model.add(layers.Conv2D(128, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(128, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+
+model.add(layers.MaxPool2D(2, strides=2))
+
+model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+
+model.add(layers.MaxPool2D(2, strides=1))
+
+model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+
+model.add(layers.MaxPool2D(2, strides=1))
+
+model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+
+model.add(layers.MaxPool2D(2, strides=1))
+
+model.add(layers.Flatten())
+model.add(layers.Dropout(0.3))
+model.add(layers.BatchNormalization())
+model.add(layers.Dense(1024, activation='relu', kernel_regularizer=l2(rf)))
+model.add(layers.Dropout(0.3))
+model.add(layers.BatchNormalization())
+model.add(layers.Dense(512, activation='relu', kernel_regularizer=l2(rf)))
+model.add(layers.Dropout(0.3))
+model.add(layers.BatchNormalization())
+model.add(layers.Dense(512, activation='relu', kernel_regularizer=l2(rf)))
+model.add(layers.Dense(1, activation='linear'))
+
+
+model.summary()
+
+
