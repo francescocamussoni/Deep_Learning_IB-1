@@ -201,7 +201,6 @@ hist = model.fit(
     validation_steps = val.shape[0] // batch_size,
     steps_per_epoch = train.shape[0] // batch_size,
     callbacks = callbacks,
-    workers = 4,
     verbose = 2
 )
 
