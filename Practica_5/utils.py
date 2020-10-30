@@ -72,8 +72,8 @@ parser.add_argument(
 )
 parser.add_argument(
     "--small",
-    type=bool,
-    default=True,
+    type=int,
+    default=1,
     help="Small dataset (default: True)",
 )
 kwargs = vars(parser.parse_args())
@@ -89,7 +89,7 @@ small_dataset = kwargs['small']
 
 description = 'lr={:.1e}_rf={:.1e}_do={}_epochs={}_bs={}_nn={}_ed={}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim)
-    
+print(small_dataset)    
 print("\n-------------------------------------")
 print('lr: {:.1e} rf: {:.1e} do: {} epochs: {} bs: {} nn: {} ed: {}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim))
