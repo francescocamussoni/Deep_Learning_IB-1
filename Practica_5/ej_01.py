@@ -117,43 +117,43 @@ model.add(layers.Input(shape=(32, 32, 3)))
 model.add(layers.Conv2D(64, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(64, 3, strides=1, activation='relu', padding='same'))
-model.add(layers.BatchNormalization())
 
 model.add(layers.MaxPool2D(2, strides=2))
+model.add(layers.BatchNormalization())
 
 model.add(layers.Conv2D(128, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(128, 3, strides=1, activation='relu', padding='same'))
-model.add(layers.BatchNormalization())
 
 model.add(layers.MaxPool2D(2, strides=2))
+model.add(layers.BatchNormalization())
 
 model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(256, 3, strides=1, activation='relu', padding='same'))
-model.add(layers.BatchNormalization())
 
 model.add(layers.MaxPool2D(2, strides=1))
-
-model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
-model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
-model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 
-model.add(layers.MaxPool2D(2, strides=1))
-
 model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
 model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
-model.add(layers.BatchNormalization())
 
 model.add(layers.MaxPool2D(2, strides=1))
+model.add(layers.BatchNormalization())
+
+model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(512, 3, strides=1, activation='relu', padding='same'))
+
+model.add(layers.MaxPool2D(2, strides=1))
+model.add(layers.BatchNormalization())
 
 model.add(layers.Flatten())
 model.add(layers.Dropout(0.3))
