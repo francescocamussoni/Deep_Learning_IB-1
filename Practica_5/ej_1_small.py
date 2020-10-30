@@ -18,7 +18,6 @@ import matplotlib.pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
 from utils import lr, rf, epochs, batch_size, description
-from utils import dogs_cats
 
 from sklearn.model_selection import train_test_split
 
@@ -29,13 +28,12 @@ from tensorflow.keras import losses, metrics, optimizers
 from tensorflow.keras.regularizers import l2
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 # Path del cluster
 path_data = os.path.join("/", "share", "apps", "DeepLearning", "Datos")
 
 # Path local
-path_data = os.getcwd()
+#path_data = os.getcwd()
 
 path_file = os.path.join(path_data, "dogs-vs-cats")
 
@@ -51,7 +49,13 @@ for file in files:
 
 train = pd.DataFrame({'files':files,'labels':labels})
 
-train["labels"] = train["labels"].replace({0: 'cat', 1: 'dog'})
+#train["labels"] = train["labels"].replace({0: 'cat', 1: 'dog'})
+train["labels"] = train["labels"].astype(str)
+
+# Separo entre train y test
+train, test = train_test_split(train, test_size=4000, stratify=train['labels'])
+# Ahora separo entre training y validacion
+train, val = train_test_split(train, test_size=4000, stratify=train['labels'])
 
 
 # Arquitectura de la mini-VGG16
@@ -116,7 +120,7 @@ model.summary()
 
 model.compile(optimizer=optimizers.Adam(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True),
-              metrics=[metrics.BinaryAccuracy(name='CAcc')])
+              metrics=[metrics.BinaryAccuracy(name='acc')])
 
 
 # Callbacks
@@ -124,18 +128,7 @@ earlystop = keras.callbacks.EarlyStopping(patience=10)
 lrr = keras.callbacks.ReduceLROnPlateau('val_acc',0.1,2,1,min_lr=1e-5)
 callbacks = [earlystop, lrr]
 
-# Separo entre train y test
-train, test = train_test_split(train, test_size=4000, stratify=train['labels'])
-# Ahora separo entre training y validacion
-train, val = train_test_split(train, test_size=4000, stratify=train['labels'])
-
-# Borrar
-#FAST_RUN = False
-#IMAGE_WIDTH=128
-#IMAGE_HEIGHT=128
-#IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_HEIGHT)
-#IMAGE_CHANNELS=3
-
+# Data Generators
 train_IDG = ImageDataGenerator(
     rotation_range=30,
     rescale=1./255,
@@ -156,7 +149,7 @@ train_generator = train_IDG.flow_from_dataframe(
 )
 
 val_IDG = ImageDataGenerator(rescale=1./255)
-validation_generator = val_IDG.flow_from_dataframe(
+val_generator = val_IDG.flow_from_dataframe(
     val,
     path_file,
     x_col='files',
@@ -166,6 +159,19 @@ validation_generator = val_IDG.flow_from_dataframe(
     batch_size=batch_size
 )
 
+test_IDG = ImageDataGenerator(rescale=1./255)
+test_generator = test_IDG.flow_from_dataframe(
+    test,
+    path_file,
+    x_col='files',
+    y_col='labels',
+    target_size=(32,32),
+    class_mode='binary',
+    batch_size=batch_size,
+    shuffle=False
+)
+
+# ESto es para mostrar algunos ejemplos
 #example_df = train.sample(n=1).reset_index(drop=True)
 #example_generator = train_IDG.flow_from_dataframe(
 #    example_df,
@@ -187,52 +193,38 @@ validation_generator = val_IDG.flow_from_dataframe(
 #plt.tight_layout()
 #plt.show()
 
-
-
-
-import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
-
-
-IDG = ImageDataGenerator(
-    rotation_range=45,  # Ang max de rotaciones
-    width_shift_range=5,    # Cant de pixeles que puede trasladarse, sepuede pasar una
-    height_shift_range=5,   # fraccion de la dimension en vez de un entero
-    shear_range=0.,     # No entendi que es
-    zoom_range=0.,      # Por lo que vi, queda re feo asi que no lo uso
-    fill_mode='nearest',    # Estrategia para llenar los huecos
-    horizontal_flip=True,   # Reflexion horizontal b -> d
-    vertical_flip=False,    # Reflexion vertical   ! -> ¡
-    # Con esto alcanza creo, el resto no tengo tan claro como funciona
-    # y prefiero dejarlo asi
+# Entrenamiento
+hist = model.fit(
+    train_generator,
+    epochs = epochs,
+    validation_data = val_generator,
+    validation_steps = val.shape[0] // batch_size,
+    steps_per_epoch = train.shape[0] // batch_size,
+    callbacks = callbacks,
+    workers = 4,
+    verbose = 2
 )
 
-# Only required if featurewise_center or featurewise_std_normalization
-# or zca_whitening are set to True.
-# IDG.fit(x_train)
-
-hist = model.fit(IDG.flow(x_train, y_train, batch_size=batch_size),
-                 epochs=epochs,
-                 steps_per_epoch=len(x_train) / batch_size,
-                 validation_data=(x_val, y_val),
-                 verbose=2)
-
 # Calculo la loss y Accuracy para los datos de test
-test_loss, test_Acc = model.evaluate(x_test, y_test)
+test_loss, test_acc = model.evaluate(test_generator)
+hist['test_loss'] = test_loss
+hist['test_acc'] = test_acc
 
-data_folder = os.path.join('Datos', '1')
+# Guardo los resultados
+data_folder = os.path.join('Datos', '1_VGG16_Small')
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 np.save(os.path.join(data_folder, '{}.npy'.format(description)), hist.history)
 
 # Guardo las imagenes
-img_folder = os.path.join('Figuras', '1')
+img_folder = os.path.join('Figuras', '1_VGG16_Small')
 if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
 # Grafico
 plt.plot(hist.history['loss'], label="Loss Training")
 plt.plot(hist.history['val_loss'], label="Loss Validation")
-plt.title("Acc Test: {:.3f}".format(test_Acc))
+plt.title("Acc Test: {:.3f}".format(test_acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Loss", fontsize=15)
 plt.legend(loc='best')
@@ -244,7 +236,7 @@ plt.close()
 
 plt.plot(hist.history['CAcc'], label="Acc. Training")
 plt.plot(hist.history['val_CAcc'], label="Acc. Validation")
-plt.title("Acc Test: {:.3f}".format(test_Acc))
+plt.title("Acc Test: {:.3f}".format(test_acc))
 plt.xlabel("Epocas", fontsize=15)
 plt.ylabel("Accuracy", fontsize=15)
 plt.legend(loc='best')
