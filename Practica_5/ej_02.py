@@ -18,3 +18,4 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 
+boca la concha de tu madre
