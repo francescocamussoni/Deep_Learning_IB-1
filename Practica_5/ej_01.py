@@ -34,12 +34,12 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array
 path_data = os.getcwd()
 
 if dogs_cats == 'small':
-    save_images = os.path.join(path_data, "dogs.vs-cats_small.npy")
-    save_label = os.path.join(path_data, "dogs.vs-cats_small_label.npy")
+    save_images = os.path.join(path_data, "dogs-vs-cats_small.npy")
+    save_label = os.path.join(path_data, "dogs-vs-cats_small_label.npy")
     path_data = os.path.join(path_data, "dogs-vs-cats_small")
 else:
-    save_images = os.path.join(path_data, "dogs.vs-cats.npy")
-    save_label = os.path.join(path_data, "dogs.vs-cats_label.npy")
+    save_images = os.path.join(path_data, "dogs-vs-cats.npy")
+    save_label = os.path.join(path_data, "dogs-vs-cats_label.npy")
     path_data = os.path.join(path_data, "dogs-vs-cats")
 
 i = 1
