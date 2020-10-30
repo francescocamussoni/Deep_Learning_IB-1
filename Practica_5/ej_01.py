@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 # Script propio para pasar argumentos por linea de comandos
 from utils import lr, rf, epochs, batch_size, description
-from utils import small_dataset
+from utils import dogs_cats
 
 from sklearn.model_selection import train_test_split
 
@@ -33,7 +33,7 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array
 #path_data = "/home/cabre1994/Desktop/Deep_Learning/Deep_Learning_IB/Datasets"
 path_data = os.getcwd()
 
-if small_dataset:
+if dogs_cats == 'small':
     save_images = os.path.join(path_data, "dogs.vs-cats_small.npy")
     save_label = os.path.join(path_data, "dogs.vs-cats_small_label.npy")
     path_data = os.path.join(path_data, "dogs-vs-cats_small")
@@ -54,7 +54,7 @@ if not os.path.exists(save_images):
         #if i > 100:
         #    continue
         
-        if small_dataset:
+        if dogs_cats == 'small':
             img = load_img(os.path.join(path_data,file))
         else:
             img = load_img(os.path.join(path_data,file), target_size=(299,299,3),interpolation="bilinear")
@@ -68,7 +68,7 @@ if not os.path.exists(save_images):
         else:
             labels = np.append(labels, 1)
 
-    if small_dataset:
+    if dogs_cats == 'small':
         images = images.reshape(-1,32,32,3)
         np.save(save_images, images)
         np.save(save_label, labels)

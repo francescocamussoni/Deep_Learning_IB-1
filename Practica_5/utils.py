@@ -71,10 +71,10 @@ parser.add_argument(
     help="Dataset (default: cifar10)",
 )
 parser.add_argument(
-    "--small",
-    type=int,
-    default=1,
-    help="Small dataset (default: True)",
+    "--dogs_cats",
+    type=str,
+    default='small',
+    help="Dogs-vs-Cats dataset (default: small)",
 )
 kwargs = vars(parser.parse_args())
 lr = kwargs["learning_rate"]
@@ -85,11 +85,11 @@ drop_arg = kwargs['Dropout']
 nn = kwargs['NumNeuronas']
 embedding_dim = kwargs['EmbeddingDim']
 dataset = kwargs["dataset"]
-small_dataset = kwargs['small']
+dogs_cats = kwargs['dogs_cats']
 
 description = 'lr={:.1e}_rf={:.1e}_do={}_epochs={}_bs={}_nn={}_ed={}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim)
-print(small_dataset)    
+print(dogs_cats)
 print("\n-------------------------------------")
 print('lr: {:.1e} rf: {:.1e} do: {} epochs: {} bs: {} nn: {} ed: {}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim))
