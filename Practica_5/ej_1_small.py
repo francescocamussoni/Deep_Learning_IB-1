@@ -8,10 +8,11 @@ Email: cabre94@hotmail.com facundo.cabrera@ib.edu.ar
 GitHub: https://github.com/cabre94
 GitLab: https://gitlab.com/cabre94
 Description: ssh facundo.cabrera@rocks7frontend.fisica.cabib
+https://www.kaggle.com/uysimty/keras-cnn-dog-or-cat-classification#Import-Library
 """
 
 import os
-import pandas as np
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -38,81 +39,19 @@ path_data = os.getcwd()
 
 path_file = os.path.join(path_data, "dogs-vs-cats")
 
-files = os.listdir(path_data)
+files = os.listdir(path_file)
 labels = np.array([],dtype=np.int)
 
+# Armo los labels
 for file in files:
     if file.startswith('cat'):
-            labels = np.append(labels, 0)
-        else:
-            labels = np.append(labels, 1)
+        labels = np.append(labels, 0)
+    else:
+        labels = np.append(labels, 1)
 
+train = pd.DataFrame({'files':files,'labels':labels})
 
-
-
-#if not os.path.exists(save_images):
-#    images = np.array([],dtype=np.uint8)
-#    labels = np.array([],dtype=np.uint8)
-#
-#    for file in os.listdir(path_data):
-#        print(i)
-#        i += 1
-#        #if i > 100:
-#        #    continue
-#        
-#        if dogs_cats == 'small':
-#            img = load_img(os.path.join(path_data,file))
-#        else:
-#            img = load_img(os.path.join(path_data,file), target_size=(299,299,3),interpolation="bilinear")
-#
-#        img_arr = img_to_array(img).astype(np.uint8)
-#
-#        images = np.append(images, img_arr)
-#
-#        if file.startswith('cat'):
-#            labels = np.append(labels, 0)
-#        else:
-#            labels = np.append(labels, 1)
-#
-#    if dogs_cats == 'small':
-#        images = images.reshape(-1,32,32,3)
-#        np.save(save_images, images)
-#        np.save(save_label, labels)
-#    else:
-#        images = images.reshape(-1,299,299,3)
-#        np.save(save_images, images)
-#        np.save(save_label, labels)
-
-# Importo los datos
-x_train = np.load(save_images)
-y_train = np.load(save_label)
-
-# Separo los datos de test
-x_train, x_test, y_train, y_test = train_test_split(x_train,
-                                                    y_train,
-                                                    test_size=4000,
-                                                    stratify=y_train)
-# Ahora separo entre training y validacion
-x_train, x_val, y_train, y_val = train_test_split(x_train,
-                                                  y_train,
-                                                  test_size=4000,
-                                                  stratify=y_train)
-
-# Normalizacion
-media = x_train.mean(axis=0)
-sigma = x_train.std(axis=0)
-
-x_train = x_train - media
-x_train /= sigma
-x_test = x_test - media
-x_test /= sigma
-x_val = x_val - media
-x_val /= sigma
-
-# Paso los labels a one-hot encoded
-#y_train = keras.utils.to_categorical(y_train, n_classes)
-#y_test = keras.utils.to_categorical(y_test, n_classes)
-#y_val = keras.utils.to_categorical(y_val, n_classes)
+train["labels"] = train["labels"].replace({0: 'cat', 1: 'dog'})
 
 
 # Arquitectura de la mini-VGG16
@@ -178,6 +117,80 @@ model.summary()
 model.compile(optimizer=optimizers.Adam(learning_rate=lr),
               loss=losses.BinaryCrossentropy(from_logits=True),
               metrics=[metrics.BinaryAccuracy(name='CAcc')])
+
+
+# Callbacks
+earlystop = keras.callbacks.EarlyStopping(patience=10)
+lrr = keras.callbacks.ReduceLROnPlateau('val_acc',0.1,2,1,min_lr=1e-5)
+callbacks = [earlystop, lrr]
+
+# Separo entre train y test
+train, test = train_test_split(train, test_size=4000, stratify=train['labels'])
+# Ahora separo entre training y validacion
+train, val = train_test_split(train, test_size=4000, stratify=train['labels'])
+
+# Borrar
+#FAST_RUN = False
+#IMAGE_WIDTH=128
+#IMAGE_HEIGHT=128
+#IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_HEIGHT)
+#IMAGE_CHANNELS=3
+
+train_IDG = ImageDataGenerator(
+    rotation_range=30,
+    rescale=1./255,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    width_shift_range=5,
+    height_shift_range=5
+)
+
+train_generator = train_IDG.flow_from_dataframe(
+    train,
+    path_file,
+    x_col='files',
+    y_col='labels',
+    target_size=(32,32),
+    class_mode='binary',
+    batch_size=batch_size
+)
+
+val_IDG = ImageDataGenerator(rescale=1./255)
+validation_generator = val_IDG.flow_from_dataframe(
+    val,
+    path_file,
+    x_col='files',
+    y_col='labels',
+    target_size=(32,32),
+    class_mode='binary',
+    batch_size=batch_size
+)
+
+#example_df = train.sample(n=1).reset_index(drop=True)
+#example_generator = train_IDG.flow_from_dataframe(
+#    example_df,
+#    path_file,
+#    x_col='files',
+#    y_col='labels',
+#    target_size=(32,32),
+#    class_mode='categorical'
+#)
+#
+#
+#plt.figure(figsize=(12, 12))
+#for i in range(0, 15):
+#    plt.subplot(5, 3, i+1)
+#    for X_batch, Y_batch in example_generator:
+#        image = X_batch[0]
+#        plt.imshow(image)
+#        break
+#plt.tight_layout()
+#plt.show()
+
+
+
+
+import ipdb; ipdb.set_trace(context=15)  # XXX BREAKPOINT
 
 
 IDG = ImageDataGenerator(
