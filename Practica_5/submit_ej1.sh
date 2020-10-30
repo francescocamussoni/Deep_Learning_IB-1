@@ -8,7 +8,7 @@
 #$ -q gpu
 ## pido una placa
 #$ -l gpu=1
-#$ -l memoria_a_usar=1G
+#$ -l memoria_a_usar=8G
 #
 # Load gpu drivers and conda
 module load miniconda
@@ -18,7 +18,5 @@ source activate deep_learning
 # Execute the script
 hostname
 
-#python ej_01.py -lr 1e-5 -rf 1e-1 -e 300 -bs 128
-#python ej_01.py -lr 1e-3 -rf 1e-3 -e 50 -bs 256 --small 1
-python ej_01.py -lr 1e-3 -rf 1e-3 -e 50 -bs 256 --small 0
-#python ej_01.py -lr 1e-5 -rf 1e-1 -e 300 -bs 128
+#python ej_01.py -lr 1e-3 -rf 3e-3 -e 100 -bs 512 --dogs_cats 'small'
+python ej_01.py -lr 1e-3 -rf 3e-3 -e 100 -bs 256 --dogs_cats 'big'
