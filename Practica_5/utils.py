@@ -32,8 +32,8 @@ parser.add_argument(
     "-e",
     "--epochs",
     type=int,
-    default=200,
-    help="Epochs (default: 200)",
+    default=50,
+    help="Epochs (default: 50)",
 )
 parser.add_argument(
     "-bs",
@@ -70,12 +70,6 @@ parser.add_argument(
     default='cifar10',
     help="Dataset (default: cifar10)",
 )
-parser.add_argument(
-    "--dogs_cats",
-    type=str,
-    default='small',
-    help="Dogs-vs-Cats dataset (default: small)",
-)
 kwargs = vars(parser.parse_args())
 lr = kwargs["learning_rate"]
 rf = kwargs["regularizer_factor"]
@@ -85,11 +79,9 @@ drop_arg = kwargs['Dropout']
 nn = kwargs['NumNeuronas']
 embedding_dim = kwargs['EmbeddingDim']
 dataset = kwargs["dataset"]
-dogs_cats = kwargs['dogs_cats']
 
 description = 'lr={:.1e}_rf={:.1e}_do={}_epochs={}_bs={}_nn={}_ed={}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim)
-print(dogs_cats)
 print("\n-------------------------------------")
 print('lr: {:.1e} rf: {:.1e} do: {} epochs: {} bs: {} nn: {} ed: {}'.format(
     lr, rf, drop_arg, epochs, batch_size, nn, embedding_dim))
