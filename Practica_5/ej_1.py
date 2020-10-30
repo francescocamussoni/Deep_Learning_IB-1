@@ -58,10 +58,10 @@ train, test = train_test_split(train, test_size=4000, stratify=train['labels'])
 train, val = train_test_split(train, test_size=4000, stratify=train['labels'])
 
 
-# Arquitectura de la mini-VGG16
-model = keras.models.Sequential(name='Mini-VGG16')
+# Arquitectura de la VGG16
+model = keras.models.Sequential(name='VGG16')
 
-model.add(layers.Input(shape=(32, 32, 3)))
+model.add(layers.Input(shape=(32, 224, 3)))
 
 model.add(layers.Conv2D(64, 3, strides=1, activation='relu', padding='same'))
 model.add(layers.BatchNormalization())
